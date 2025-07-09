@@ -1,0 +1,34 @@
+{
+  "manifest_version": 3,
+  "name": "PR Manager",
+  "version": "0.1.0",
+  "description": "Monitor multiple GitHub PR listing pages and get notified about pending reviews.",
+  "permissions": [
+    "storage",
+    "notifications",
+    "identity",
+    "alarms",
+    "scripting",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "https://github.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icon-16.png",
+      "48": "icon-48.png",
+      "128": "icon-128.png"
+    }
+  },
+  "options_page": "options.html",
+  "icons": {
+    "16": "icon-16.png",
+    "48": "icon-48.png",
+    "128": "icon-128.png"
+  }
+}

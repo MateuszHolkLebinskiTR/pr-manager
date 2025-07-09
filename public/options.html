@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PR Manager Settings</title>
+  <link rel="stylesheet" href="../src/style.css" />
+</head>
+<body>
+  <div id="options-app">
+    <h2>Settings</h2>
+    <form id="settings-form">
+      <label>Notification Interval (minutes): <input type="number" id="interval" min="1" max="240" /></label><br>
+      <label>Working Hours: <input type="text" id="working-hours" placeholder="09:00-18:00" /></label><br>
+      <label>Show Notification History: <input type="checkbox" id="show-history" /></label><br>
+      <label>Custom Notification Message: <input type="text" id="custom-message" /></label><br>
+      <label>GitHub Token: <input type="password" id="github-token" autocomplete="off" /></label><br>
+      <small>Generate a token at <a href="https://github.com/settings/tokens" target="_blank">GitHub Settings</a> (repo, read:user scopes)</small><br>
+      <button type="submit">Save</button>
+    </form>
+    <button id="export-pr-list">Export PR List</button>
+    <button id="import-pr-list">Import PR List</button>
+    <button id="generate-ms-teams">Generate MS Teams Message</button>
+    <hr>
+    <div id="notification-history-section" style="display:none;">
+      <h3>Notification History</h3>
+      <ul id="notification-history-list"></ul>
+    </div>
+  </div>
+  <script src="options.js"></script>
+</body>
+</html>
