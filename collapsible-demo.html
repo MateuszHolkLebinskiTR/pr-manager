@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PR Manager - Collapsible Sections Demo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .popup-demo {
+            width: 400px;
+            margin: 0 auto;
+            border: 2px solid #007bff;
+            border-radius: 8px;
+            background: white;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .popup-header {
+            background: #007bff;
+            color: white;
+            padding: 12px;
+            border-radius: 6px 6px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .popup-body {
+            padding: 15px;
+        }
+        .collapsible-header {
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .collapsible-header:hover {
+            background-color: #e9ecef !important;
+        }
+        .collapsible-header:hover.bg-info {
+            background-color: #138496 !important;
+        }
+        .collapse-icon {
+            transition: transform 0.3s ease;
+            font-size: 0.8rem;
+        }
+        .comparison-section {
+            margin-top: 30px;
+        }
+        .before-after {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .before-after > div {
+            flex: 1;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        .comparison-header {
+            padding: 10px 15px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .comparison-body {
+            padding: 15px;
+        }
+        .feature-highlight {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center mb-4">🔄 PR Manager - Collapsible Sections</h1>
+        
+        <div class="alert alert-success">
+            <strong>✨ New Feature:</strong> Quick Filters and PR Overview sections are now collapsible! 
+            This keeps the popup compact while still providing access to advanced features.
+        </div>
+
+        <div class="popup-demo">
+            <div class="popup-header">
+                <h5 class="mb-0">🔄 PR Manager</h5>
+                <div>
+                    <button class="btn btn-outline-light btn-sm me-2">🔄</button>
+                    <button class="btn btn-outline-light btn-sm">⚙️</button>
+                </div>
+            </div>
+            
+            <div class="popup-body">
+                <!-- Quick Filters - Collapsible -->
+                <div class="card border-0 shadow-sm mb-3">
+                    <div class="card-header bg-light text-dark py-2 collapsible-header" data-toggle="collapse" data-target="#quickFiltersDemo" aria-expanded="false" aria-controls="quickFiltersDemo">
+                        <h6 class="card-title mb-0 d-flex justify-content-between align-items-center">
+                            <span>🔍 Quick Filters</span>
+                            <span class="collapse-icon">▼</span>
+                        </h6>
+                    </div>
+                    <div class="collapse" id="quickFiltersDemo">
+                        <div class="card-body py-2">
+                            <div class="custom-control custom-checkbox mb-2">
+                                <input type="checkbox" class="custom-control-input" id="demo-filter-approvals">
+                                <label class="custom-control-label" for="demo-filter-approvals">
+                                    <small>Only show PRs with less than 3 approvals</small>
+                                </label>
+                            </div>
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="demo-filter-my-approval">
+                                <label class="custom-control-label" for="demo-filter-my-approval">
+                                    <small>Hide PRs I've already approved</small>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="d-flex flex-column mb-3">
+                    <button class="btn btn-outline-primary btn-block mb-2">
+                        🔔 Check Now
+                    </button>
+                    <button class="btn btn-outline-secondary btn-block">
+                        📋 Show PR Overview
+                    </button>
+                </div>
+                
+                <!-- PR List -->
+                <div class="border rounded p-3 bg-light mb-3">
+                    <div class="text-center">
+                        <small class="text-muted">PR repositories will appear here</small>
+                    </div>
+                </div>
+                
+                <!-- PR Overview - Collapsible -->
+                <div class="card border-0 shadow-sm mb-3">
+                    <div class="card-header bg-info text-white py-2 collapsible-header" data-toggle="collapse" data-target="#prOverviewDemo" aria-expanded="true" aria-controls="prOverviewDemo">
+                        <h6 class="card-title mb-0 d-flex justify-content-between align-items-center">
+                            <span>📋 PR Overview</span>
+                            <div class="d-flex align-items-center">
+                                <span class="collapse-icon mr-2">▼</span>
+                                <button class="btn btn-outline-light btn-sm" onclick="event.stopPropagation();">
+                                    ✕
+                                </button>
+                            </div>
+                        </h6>
+                    </div>
+                    <div class="collapse show" id="prOverviewDemo">
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <small class="text-muted">PR overview content would appear here...</small>
+                            </div>
+                            <div class="text-center">
+                                <button class="btn btn-outline-secondary btn-sm">
+                                    📋 Copy to Clipboard
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="feature-highlight">
+            <h5>🎯 Key Features:</h5>
+            <ul class="mb-0">
+                <li><strong>Collapsible Sections:</strong> Click headers to expand/collapse</li>
+                <li><strong>Visual Feedback:</strong> Icons rotate when sections open/close</li>
+                <li><strong>Hover Effects:</strong> Headers highlight on hover</li>
+                <li><strong>Compact Design:</strong> Collapsed sections save space</li>
+                <li><strong>Smooth Animations:</strong> Bootstrap transitions for professional feel</li>
+            </ul>
+        </div>
+
+        <div class="comparison-section">
+            <h3>📊 Before vs After</h3>
+            <div class="before-after">
+                <div>
+                    <div class="comparison-header bg-danger text-white">❌ Before</div>
+                    <div class="comparison-body">
+                        <h6>Issues:</h6>
+                        <ul>
+                            <li>Fixed section heights</li>
+                            <li>No space optimization</li>
+                            <li>Always visible sections</li>
+                            <li>Cluttered interface</li>
+                        </ul>
+                        <p class="text-muted small">Popup always took full height even when sections weren't needed</p>
+                    </div>
+                </div>
+                
+                <div>
+                    <div class="comparison-header bg-success text-white">✅ After</div>
+                    <div class="comparison-body">
+                        <h6>Benefits:</h6>
+                        <ul>
+                            <li>Collapsible sections</li>
+                            <li>Space-efficient design</li>
+                            <li>Show/hide on demand</li>
+                            <li>Clean interface</li>
+                        </ul>
+                        <p class="text-success small">Popup adapts to user needs - compact when collapsed, full-featured when expanded</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="alert alert-info mt-4">
+            <h6>💡 How to Use:</h6>
+            <ol class="mb-0">
+                <li><strong>Quick Filters:</strong> Click the "🔍 Quick Filters" header to expand/collapse filter options</li>
+                <li><strong>PR Overview:</strong> When showing PR overview, click the "📋 PR Overview" header to collapse/expand the content</li>
+                <li><strong>Visual Cues:</strong> Icons (▼/▲) show current state and rotate when toggled</li>
+                <li><strong>Persistent State:</strong> Sections remember their state while popup is open</li>
+            </ol>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Handle collapse icon rotation
+        $(document).ready(function() {
+            $('[data-toggle="collapse"]').on('click', function() {
+                const icon = $(this).find('.collapse-icon');
+                const target = $($(this).attr('data-target'));
+                
+                setTimeout(() => {
+                    if (target.hasClass('show')) {
+                        icon.text('▲');
+                    } else {
+                        icon.text('▼');
+                    }
+                }, 300);
+            });
+        });
+    </script>
+</body>
+</html>

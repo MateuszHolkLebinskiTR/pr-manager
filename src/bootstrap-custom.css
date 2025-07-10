@@ -22,6 +22,53 @@
   max-width: 800px;
 }
 
+/* Collapsible section styling */
+.card-header[data-target] {
+  transition: background-color 0.2s ease;
+}
+
+.card-header[data-target]:hover {
+  background-color: #e9ecef !important;
+}
+
+.card-header[data-target]:hover.bg-info {
+  background-color: #138496 !important;
+}
+
+.card-header[data-target]:hover.bg-light {
+  background-color: #dee2e6 !important;
+}
+
+.collapsible-header {
+  cursor: pointer;
+  user-select: none;
+}
+
+.collapse-content {
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.collapse-icon {
+  transition: transform 0.3s ease;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.collapsible-header:hover .collapse-icon {
+  transform: scale(1.1);
+}
+
+/* Close button styling in collapsible headers */
+.collapsible-header .btn {
+  transition: all 0.2s ease;
+}
+
+.collapsible-header .btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
 /* PR Page Item Styling */
 .pr-page-item {
   display: flex;
@@ -264,4 +311,23 @@
 .list-group-item:hover {
   border-left-color: var(--pr-primary);
   background-color: rgba(0, 123, 255, 0.05);
+}
+
+/* Collapsible PR List Section */
+.card-header.bg-success:hover {
+  background-color: #1e7e34 !important;
+}
+
+/* PR List within collapsible section */
+#prListCollapse .pr-page-item {
+  margin: 0.25rem 0;
+  padding: 0.5rem 0.75rem;
+}
+
+#prListCollapse .pr-page-item.empty {
+  text-align: center;
+  font-style: italic;
+  color: var(--pr-secondary);
+  background: #f8f9fa;
+  border: 1px dashed #dee2e6;
 }

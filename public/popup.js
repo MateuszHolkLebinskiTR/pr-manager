@@ -256,6 +256,59 @@ document.addEventListener('DOMContentLoaded', () => {
   // Load filter settings on popup open
   loadFilterSettings();
 
+  // Handle collapsible sections
+  function setupCollapsibleSections() {
+    console.log('Setting up collapsible sections...');
+    const collapsibleHeaders = document.querySelectorAll('.collapsible-header');
+    console.log('Found collapsible headers:', collapsibleHeaders.length);
+    
+    collapsibleHeaders.forEach((header, index) => {
+      console.log(`Adding click listener to collapsible header ${index}:`, header);
+      const targetId = header.getAttribute('data-target');
+      const targetElement = document.getElementById(targetId);
+      const icon = header.querySelector('.collapse-icon');
+      
+      console.log(`Header ${index} - Target ID: ${targetId}, Element found: ${!!targetElement}, Icon found: ${!!icon}`);
+      
+      header.addEventListener('click', (e) => {
+        // Check if the click came from a button inside the header
+        if (e.target.tagName === 'BUTTON' || e.target.closest('button')) {
+          console.log('Click originated from button, ignoring collapse toggle');
+          return;
+        }
+        
+        e.preventDefault();
+        e.stopPropagation();
+        
+        console.log('Collapsible header clicked:', targetId);
+        
+        if (targetElement && icon) {
+          const isCurrentlyHidden = targetElement.style.display === 'none';
+          
+          if (isCurrentlyHidden) {
+            // Expand
+            targetElement.style.display = 'block';
+            icon.textContent = '▲';
+            header.setAttribute('aria-expanded', 'true');
+            console.log('Expanded section:', targetId);
+          } else {
+            // Collapse
+            targetElement.style.display = 'none';
+            icon.textContent = '▼';
+            header.setAttribute('aria-expanded', 'false');
+            console.log('Collapsed section:', targetId);
+          }
+        } else {
+          console.warn('Could not find target element or icon:', targetId);
+        }
+      });
+    });
+  }
+  
+  // Initialize collapsible sections
+  console.log('Initializing collapsible sections...');
+  setupCollapsibleSections();
+
   // Refresh button
   const refreshBtn = document.getElementById('refresh-list');
   if (refreshBtn) {
@@ -518,7 +571,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // Close PR Overview button
   const closeOverviewBtn = document.getElementById('close-pr-overview');
   if (closeOverviewBtn) {
-    closeOverviewBtn.addEventListener('click', () => {
+    closeOverviewBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation(); // Prevent the collapsible header from triggering
       console.log('Close PR Overview button clicked');
       const sectionEl = document.getElementById('pr-overview-section');
       if (sectionEl) {

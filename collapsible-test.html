@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PR Manager - Test Collapsible Fixed</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="src/bootstrap-custom.css" />
+    <style>
+        body {
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .popup-test {
+            width: 400px;
+            margin: 0 auto;
+            padding: 15px;
+            background: white;
+            border: 2px solid #007bff;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center mb-4">🔄 Test Collapsible Sections - FIXED</h1>
+        
+        <div class="popup-test">
+            <!-- Quick Filter Options (Collapsible) -->
+            <div class="card border-0 shadow-sm mb-3">
+                <div class="card-header bg-light text-dark py-2 collapsible-header" data-target="quickFiltersCollapse" style="cursor: pointer;">
+                    <h6 class="card-title mb-0 d-flex justify-content-between align-items-center">
+                        <span>🔍 Quick Filters</span>
+                        <span class="collapse-icon">▼</span>
+                    </h6>
+                </div>
+                <div class="collapse-content" id="quickFiltersCollapse" style="display: none;">
+                    <div class="card-body py-2">
+                        <div class="custom-control custom-checkbox mb-2">
+                            <input type="checkbox" class="custom-control-input" id="test-filter-approvals">
+                            <label class="custom-control-label" for="test-filter-approvals">
+                                <small>Only show PRs with less than 3 approvals</small>
+                            </label>
+                        </div>
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="test-filter-my-approval">
+                            <label class="custom-control-label" for="test-filter-my-approval">
+                                <small>Hide PRs I've already approved</small>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- PR Overview Section (Collapsible) -->
+            <div class="card border-0 shadow-sm mb-3">
+                <div class="card-header bg-info text-white py-2 collapsible-header" data-target="prOverviewCollapse" style="cursor: pointer;">
+                    <h6 class="card-title mb-0 d-flex justify-content-between align-items-center">
+                        <span>📋 PR Overview</span>
+                        <div class="d-flex align-items-center">
+                            <span class="collapse-icon mr-2">▲</span>
+                        </div>
+                    </h6>
+                </div>
+                <div class="collapse-content" id="prOverviewCollapse" style="display: block;">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <p>This is the PR overview content. It should collapse and expand when you click the header.</p>
+                            <ul>
+                                <li>PR #1: Feature implementation</li>
+                                <li>PR #2: Bug fix</li>
+                                <li>PR #3: Documentation update</li>
+                            </ul>
+                        </div>
+                        <div class="text-center">
+                            <button class="btn btn-outline-secondary btn-sm">
+                                📋 Copy to Clipboard
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="alert alert-success">
+                <strong>✅ Working Test:</strong><br>
+                1. Click on "🔍 Quick Filters" header - should expand (starts collapsed)<br>
+                2. Click on "📋 PR Overview" header - should collapse (starts expanded)<br>
+                3. Icons should change from ▼ to ▲ when expanded<br>
+                4. Check console for debug logs
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Handle collapsible sections
+        function setupCollapsibleSections() {
+            const collapsibleHeaders = document.querySelectorAll('.collapsible-header');
+            console.log('Found collapsible headers:', collapsibleHeaders.length);
+            
+            collapsibleHeaders.forEach((header, index) => {
+                console.log(`Setting up header ${index}:`, header.getAttribute('data-target'));
+                
+                header.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const targetId = header.getAttribute('data-target');
+                    const targetElement = document.getElementById(targetId);
+                    const icon = header.querySelector('.collapse-icon');
+                    
+                    console.log('Clicked header:', targetId, 'Current display:', targetElement?.style.display);
+                    
+                    if (targetElement && icon) {
+                        if (targetElement.style.display === 'none') {
+                            // Expand
+                            targetElement.style.display = 'block';
+                            icon.textContent = '▲';
+                            header.setAttribute('aria-expanded', 'true');
+                            console.log('✅ Expanded section');
+                        } else {
+                            // Collapse
+                            targetElement.style.display = 'none';
+                            icon.textContent = '▼';
+                            header.setAttribute('aria-expanded', 'false');
+                            console.log('✅ Collapsed section');
+                        }
+                    } else {
+                        console.error('❌ Missing elements:', { targetElement, icon });
+                    }
+                });
+            });
+        }
+        
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🚀 DOM loaded, setting up collapsible sections...');
+            setupCollapsibleSections();
+        });
+    </script>
+</body>
+</html>

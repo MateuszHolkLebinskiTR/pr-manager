@@ -24,23 +24,28 @@
       </div>
     </div>
     
-    <!-- Quick Filter Options -->
+    <!-- Quick Filter Options (Collapsible) -->
     <div class="card border-0 shadow-sm mb-3">
-      <div class="card-header bg-light text-dark py-2">
-        <h6 class="card-title mb-0">🔍 Quick Filters</h6>
+      <div class="card-header bg-light text-dark py-2 collapsible-header" data-target="quickFiltersCollapse" style="cursor: pointer;">
+        <h6 class="card-title mb-0 d-flex justify-content-between align-items-center">
+          <span>🔍 Quick Filters</span>
+          <span class="collapse-icon">▼</span>
+        </h6>
       </div>
-      <div class="card-body py-2">
-        <div class="custom-control custom-checkbox mb-2">
-          <input type="checkbox" class="custom-control-input" id="popup-filter-approvals">
-          <label class="custom-control-label" for="popup-filter-approvals">
-            <small>Only show PRs with less than 3 approvals</small>
-          </label>
-        </div>
-        <div class="custom-control custom-checkbox">
-          <input type="checkbox" class="custom-control-input" id="popup-filter-my-approval">
-          <label class="custom-control-label" for="popup-filter-my-approval">
-            <small>Hide PRs I've already approved</small>
-          </label>
+      <div class="collapse-content" id="quickFiltersCollapse" style="display: none;">
+        <div class="card-body py-2">
+          <div class="custom-control custom-checkbox mb-2">
+            <input type="checkbox" class="custom-control-input" id="popup-filter-approvals">
+            <label class="custom-control-label" for="popup-filter-approvals">
+              <small>Only show PRs with less than 3 approvals</small>
+            </label>
+          </div>
+          <div class="custom-control custom-checkbox">
+            <input type="checkbox" class="custom-control-input" id="popup-filter-my-approval">
+            <label class="custom-control-label" for="popup-filter-my-approval">
+              <small>Hide PRs I've already approved</small>
+            </label>
+          </div>
         </div>
       </div>
     </div>
@@ -58,24 +63,43 @@
       </button>
     </div>
     
-    <!-- PR List -->
-    <div id="pr-list" class="mb-3"></div>
-    
-    <!-- PR Overview Section -->
-    <div id="pr-overview-section" class="card border-0 shadow-sm mb-3" style="display: none;">
-      <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
-        <h6 class="card-title mb-0">📋 PR Overview</h6>
-        <button id="close-pr-overview" class="btn btn-outline-light btn-sm">
-          ✕
-        </button>
+    <!-- PR List (Collapsible) -->
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-header bg-success text-white py-2 collapsible-header" data-target="prListCollapse" style="cursor: pointer;">
+        <h6 class="card-title mb-0 d-flex justify-content-between align-items-center">
+          <span>📁 Repository List</span>
+          <span class="collapse-icon">▲</span>
+        </h6>
       </div>
-      <div class="card-body">
-        <div id="pr-overview-content" class="pr-overview-content mb-3"></div>
-        <div class="text-center">
-          <button id="copy-pr-overview" class="btn btn-outline-secondary">
-            <span class="mr-2">📋</span>
-            Copy to Clipboard
-          </button>
+      <div class="collapse-content" id="prListCollapse" style="display: block;">
+        <div class="card-body py-2">
+          <div id="pr-list"></div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- PR Overview Section (Collapsible) -->
+    <div id="pr-overview-section" class="card border-0 shadow-sm mb-3" style="display: none;">
+      <div class="card-header bg-info text-white py-2 collapsible-header" data-target="prOverviewCollapse" style="cursor: pointer;">
+        <h6 class="card-title mb-0 d-flex justify-content-between align-items-center">
+          <span>📋 PR Overview</span>
+          <div class="d-flex align-items-center">
+            <span class="collapse-icon mr-2">▲</span>
+            <button id="close-pr-overview" class="btn btn-outline-light btn-sm">
+              ✕
+            </button>
+          </div>
+        </h6>
+      </div>
+      <div class="collapse-content" id="prOverviewCollapse" style="display: block;">
+        <div class="card-body">
+          <div id="pr-overview-content" class="pr-overview-content mb-3"></div>
+          <div class="text-center">
+            <button id="copy-pr-overview" class="btn btn-outline-secondary">
+              <span class="mr-2">📋</span>
+              Copy to Clipboard
+            </button>
+          </div>
         </div>
       </div>
     </div>

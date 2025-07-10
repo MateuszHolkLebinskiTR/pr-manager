@@ -6,6 +6,7 @@ A modern Chrome extension for managing GitHub Pull Request notifications with ad
 
 ### 🔍 Advanced PR Filtering (Optional)
 - **Popup quick filters**: Toggle filters directly in the popup without going to settings
+- **Collapsible interface**: Quick Filters and PR Overview sections can be collapsed to save space
 - **Configurable approval filtering**: Optional setting to only show PRs with less than 3 approvals
 - **Personal approval filtering**: Optional setting to hide PRs you've already approved
 - **Flexible combinations**: Enable one filter, both filters, or neither based on your needs
