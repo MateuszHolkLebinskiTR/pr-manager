@@ -8,22 +8,86 @@
 </head>
 <body>
   <div id="options-app">
-    <h2>Settings</h2>
-    <form id="settings-form">
-      <label>Notification Interval (minutes): <input type="number" id="interval" min="1" max="240" /></label><br>
-      <label>Working Hours: <input type="text" id="working-hours" placeholder="09:00-18:00" /></label><br>
-      <label>Show Notification History: <input type="checkbox" id="show-history" /></label><br>
-      <label>Custom Notification Message: <input type="text" id="custom-message" /></label><br>
-      <label>GitHub Token: <input type="password" id="github-token" autocomplete="off" /></label><br>
-      <small>Generate a token at <a href="https://github.com/settings/tokens" target="_blank">GitHub Settings</a> (repo, read:user scopes)</small><br>
-      <button type="submit">Save</button>
-    </form>
-    <button id="export-pr-list">Export PR List</button>
-    <button id="import-pr-list">Import PR List</button>
-    <button id="generate-ms-teams">Generate MS Teams Message</button>
-    <hr>
-    <div id="notification-history-section" style="display:none;">
-      <h3>Notification History</h3>
+    <div class="card-header">
+      <h2 class="card-title">⚙️ PR Manager Settings</h2>
+    </div>
+    
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">🔔 Notification Settings</h3>
+      </div>
+      <form id="settings-form">
+        <label>
+          <span>Notification Interval (minutes)</span>
+          <input type="number" id="interval" min="1" max="240" placeholder="15" />
+          <small>How often to check for new PR notifications</small>
+        </label>
+        
+        <label>
+          <span>Working Hours</span>
+          <input type="text" id="working-hours" placeholder="09:00-18:00" />
+          <small>Only show notifications during these hours (24-hour format)</small>
+        </label>
+        
+        <label class="flex items-center">
+          <input type="checkbox" id="show-history" />
+          <span>Show Notification History</span>
+        </label>
+        
+        <label>
+          <span>Custom Notification Message</span>
+          <input type="text" id="custom-message" placeholder="You have pending PR reviews!" />
+          <small>Customize the notification message text</small>
+        </label>
+      </form>
+    </div>
+    
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">🔑 GitHub Integration</h3>
+      </div>
+      <form>
+        <label>
+          <span>GitHub Personal Access Token</span>
+          <input type="password" id="github-token" autocomplete="off" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" />
+          <small>
+            Generate a token at 
+            <a href="https://github.com/settings/tokens" target="_blank">GitHub Settings</a> 
+            with <strong>repo</strong> and <strong>read:user</strong> scopes
+          </small>
+        </label>
+      </form>
+    </div>
+    
+    <div class="button-group space-between">
+      <button type="submit" form="settings-form" class="primary">
+        <span>💾</span>
+        Save Settings
+      </button>
+      <div class="flex gap-2">
+        <button id="export-pr-list" class="secondary">
+          <span>📤</span>
+          Export
+        </button>
+        <button id="import-pr-list" class="secondary">
+          <span>📥</span>
+          Import
+        </button>
+        <button id="generate-ms-teams" class="secondary">
+          <span>💬</span>
+          Teams Message
+        </button>
+      </div>
+    </div>
+    
+    <div id="status-message" class="notification info hidden">
+      <span id="status-text"></span>
+    </div>
+    
+    <div id="notification-history-section" class="card hidden">
+      <div class="card-header">
+        <h3 class="card-title">📋 Notification History</h3>
+      </div>
       <ul id="notification-history-list"></ul>
     </div>
   </div>

@@ -1,6 +1,19 @@
 // Handles settings/options for PR Manager
 // Loads and saves settings, handles export/import, MS Teams message generation
 
+function showStatus(message, type = 'info') {
+  const statusEl = document.getElementById('status-message');
+  const statusText = document.getElementById('status-text');
+  
+  statusEl.className = `notification ${type}`;
+  statusText.textContent = message;
+  statusEl.classList.remove('hidden');
+  
+  setTimeout(() => {
+    statusEl.classList.add('hidden');
+  }, 3000);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('settings-form');
   const intervalInput = document.getElementById('interval');
@@ -9,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const customMessageInput = document.getElementById('custom-message');
   const githubTokenInput = document.getElementById('github-token');
 
+  // Load existing settings
   chrome.storage.sync.get({
     interval: 60,
     workingHours: '09:00-18:00',
@@ -21,31 +35,48 @@ document.addEventListener('DOMContentLoaded', () => {
     showHistoryInput.checked = data.showHistory;
     customMessageInput.value = data.customMessage;
     githubTokenInput.value = data.githubToken;
+    
+    // Update notification history visibility
+    loadNotificationHistory();
   });
 
+  // Save settings
   form.onsubmit = (e) => {
     e.preventDefault();
-    chrome.storage.sync.set({
+    
+    const settings = {
       interval: Number(intervalInput.value),
       workingHours: workingHoursInput.value,
       showHistory: showHistoryInput.checked,
       customMessage: customMessageInput.value,
       githubToken: githubTokenInput.value
-    }, () => {
-      alert('Settings saved!');
+    };
+    
+    chrome.storage.sync.set(settings, () => {
+      showStatus('Settings saved successfully! ✅', 'success');
       chrome.runtime.sendMessage({ type: 'settings-updated' });
+      loadNotificationHistory(); // Refresh history visibility
     });
   };
 
+  // Export PR list
   document.getElementById('export-pr-list').onclick = () => {
     chrome.storage.sync.get({ prPages: [] }, (data) => {
-      const blob = new Blob([JSON.stringify(data.prPages)], { type: 'application/json' });
+      const exportData = {
+        prPages: data.prPages,
+        exportDate: new Date().toISOString(),
+        version: '1.0'
+      };
+      
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'pr-pages.json';
+      a.download = `pr-manager-export-${new Date().toISOString().split('T')[0]}.json`;
       a.click();
       URL.revokeObjectURL(url);
+      
+      showStatus('PR list exported successfully! 📤', 'success');
     });
   };
 

@@ -8,10 +8,30 @@
 </head>
 <body>
   <div id="popup-app">
-    <h2>PR Manager</h2>
-    <div id="pr-list"></div>
-    <button id="add-pr-page">Add PR Page</button>
-    <button id="open-settings">Settings</button>
+    <div class="card-header">
+      <h2 class="card-title">🔄 PR Manager</h2>
+      <div class="flex items-center gap-2">
+        <button id="refresh-list" class="icon-button ghost" title="Refresh">
+          <span>🔄</span>
+        </button>
+        <button id="open-settings" class="icon-button ghost" title="Settings">
+          <span>⚙️</span>
+        </button>
+      </div>
+    </div>
+    
+    <div id="pr-list" class="mb-4"></div>
+    
+    <div class="button-group centered">
+      <button id="add-pr-page" class="primary">
+        <span>➕</span>
+        Add PR Page
+      </button>
+    </div>
+    
+    <div id="status-message" class="notification info hidden">
+      <span id="status-text"></span>
+    </div>
   </div>
   <script src="popup.js"></script>
 </body>
