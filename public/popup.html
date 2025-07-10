@@ -20,13 +20,37 @@
       </div>
     </div>
     
-    <div id="pr-list" class="mb-4"></div>
     
     <div class="button-group centered">
-      <button id="add-pr-page" class="primary">
-        <span>➕</span>
-        Add PR Page
+      <button id="check-now" class="secondary">
+        <span>🔔</span>
+        Check Now
       </button>
+    </div>
+    
+    <div class="button-group centered">
+      <button id="show-pr-overview" class="secondary">
+        <span>📋</span>
+        Show PR Overview
+      </button>
+    </div>
+    
+    <div id="pr-overview-section" class="card hidden">
+      <div class="card-header">
+        <h3 class="card-title">📋 PR Overview</h3>
+        <button id="close-pr-overview" class="icon-button ghost">
+          <span>✕</span>
+        </button>
+      </div>
+      <div class="pr-overview-container">
+        <div id="pr-overview-content" class="pr-overview-content"></div>
+        <div class="button-group centered">
+          <button id="copy-pr-overview" class="secondary">
+            <span>📋</span>
+            Copy to Clipboard
+          </button>
+        </div>
+      </div>
     </div>
     
     <div id="status-message" class="notification info hidden">

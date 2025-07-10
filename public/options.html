@@ -17,27 +17,36 @@
         <h3 class="card-title">🔔 Notification Settings</h3>
       </div>
       <form id="settings-form">
-        <label>
-          <span>Notification Interval (minutes)</span>
-          <input type="number" id="interval" min="1" max="240" placeholder="15" />
-          <small>How often to check for new PR notifications</small>
-        </label>
+        <div class="form-group">
+          <label>
+            <span>Notification Interval (minutes)</span>
+            <input type="number" id="interval" min="1" max="240" placeholder="15" />
+            <small>How often to check for new PR notifications</small>
+          </label>
+        </div>
         
-        <label>
-          <span>Working Hours</span>
-          <input type="text" id="working-hours" placeholder="09:00-18:00" />
-          <small>Only show notifications during these hours (24-hour format)</small>
-        </label>
+        <div class="form-group">
+          <label>
+            <span>Working Hours</span>
+            <input type="text" id="working-hours" placeholder="09:00-18:00" />
+            <small>Only show notifications during these hours (24-hour format)</small>
+          </label>
+        </div>
         
-        <label class="flex items-center">
-          <input type="checkbox" id="show-history" />
-          <span>Show Notification History</span>
-        </label>
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input type="checkbox" id="show-history" />
+            <span>Show Notification History</span>
+          </label>
+        </div>
         
-        <label>
-          <span>Custom Notification Message</span>
-          <input type="text" id="custom-message" placeholder="You have pending PR reviews!" />
-          <small>Customize the notification message text</small>
+        <div class="form-group">
+          <label>
+            <span>Custom Notification Message</span>
+            <input type="text" id="custom-message" placeholder="You have pending PR reviews!" />
+            <small>Customize the notification message text</small>
+          </label>
+        </div>
         </label>
       </form>
     </div>
@@ -46,7 +55,7 @@
       <div class="card-header">
         <h3 class="card-title">🔑 GitHub Integration</h3>
       </div>
-      <form>
+      <div class="form-group">
         <label>
           <span>GitHub Personal Access Token</span>
           <input type="password" id="github-token" autocomplete="off" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" />
@@ -56,7 +65,20 @@
             with <strong>repo</strong> and <strong>read:user</strong> scopes
           </small>
         </label>
-      </form>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">📋 Repository Management</h3>
+        <button id="add-repository" class="secondary">
+          <span>➕</span>
+          Add Repository
+        </button>
+      </div>
+      <div id="repository-list" class="repository-list">
+        <!-- Repository sections will be dynamically added here -->
+      </div>
     </div>
     
     <div class="button-group space-between">
@@ -77,11 +99,30 @@
           <span>💬</span>
           Teams Message
         </button>
+        <button id="preview-teams-message" class="secondary">
+          <span>👀</span>
+          Preview
+        </button>
       </div>
     </div>
     
     <div id="status-message" class="notification info hidden">
       <span id="status-text"></span>
+    </div>
+    
+    <div id="teams-preview-section" class="card hidden">
+      <div class="card-header">
+        <h3 class="card-title">👀 Teams Message Preview</h3>
+      </div>
+      <div class="preview-container">
+        <pre id="teams-preview-content"></pre>
+        <div class="button-group centered">
+          <button id="copy-preview" class="primary">
+            <span>📋</span>
+            Copy to Clipboard
+          </button>
+        </div>
+      </div>
     </div>
     
     <div id="notification-history-section" class="card hidden">

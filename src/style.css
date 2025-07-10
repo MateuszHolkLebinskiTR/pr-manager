@@ -366,7 +366,9 @@ button:disabled:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-}/* Form elements */
+}
+
+/* Form elements */
 form {
   display: flex;
   flex-direction: column;
@@ -516,54 +518,190 @@ li:last-child {
   display: none;
 }
 
-/* Responsive design */
-@media (max-width: 640px) {
-  #popup-app {
-    width: 320px;
-    padding: 1rem;
-  }
-  
-  #options-app {
-    margin: 1rem;
-    padding: 1rem;
-  }
-  
-  .button-group {
-    flex-direction: column;
-  }
-  
-  .button-group.space-between {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-  
-  .pr-page-item {
-    flex-direction: column;
-    gap: 0.75rem;
-    align-items: flex-start;
-  }
-  
-  .pr-page-item span {
-    margin-right: 0;
-  }
+/* Form groups and improved layout */
+.form-group {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  transition: all 0.2s ease;
 }
 
-/* Logo animations */
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+.form-group:hover {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
 }
 
-.logo:hover {
-  filter: drop-shadow(0 0 2em var(--primary-color));
+.form-group:last-child {
+  margin-bottom: 0;
 }
 
-.logo.vanilla:hover {
-  filter: drop-shadow(0 0 2em #f7df1e);
+.form-group label {
+  margin: 0;
 }
 
-.read-the-docs {
+.form-group label span {
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.form-group input {
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.form-group small {
+  display: block;
+  margin-top: 0.5rem;
   color: var(--text-secondary);
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+/* Checkbox specific styling */
+.checkbox-label {
+  display: flex !important;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: auto !important;
+  margin: 0 !important;
+  flex-shrink: 0;
+}
+
+.checkbox-label span {
+  margin: 0 !important;
+  font-weight: 500 !important;
+}
+
+/* Repository Management */
+.repository-list {
+  margin-top: 1rem;
+}
+
+.repository-item {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  transition: all 0.2s ease;
+}
+
+.repository-item:hover {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.repository-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.repository-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.repository-url {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin: 0.25rem 0 0 0;
+}
+
+.repository-controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.tracked-users-section {
+  margin-top: 1rem;
+}
+
+.tracked-users-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.tracked-users-header h4 {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.user-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.user-tag {
+  background: var(--primary-color);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.user-tag .remove-user {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 0;
+  font-size: 0.9rem;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.user-tag .remove-user:hover {
+  opacity: 1;
+}
+
+.add-user-input {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.add-user-input input {
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+}
+
+.add-user-input button {
+  padding: 0.5rem 1rem;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.repository-empty {
+  text-align: center;
+  color: var(--text-secondary);
+  font-style: italic;
+  padding: 2rem;
+  border: 2px dashed var(--border-color);
+  border-radius: var(--radius-md);
+  margin: 1rem 0;
 }
