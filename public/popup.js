@@ -544,8 +544,8 @@ document.addEventListener('DOMContentLoaded', () => {
       html = `<div class="pr-overview-header">📋 <strong>GitHub PRs to Review (${totalPRs} total):</strong></div><br>`;
       
       overviewData.forEach((repo, index) => {
-        const userFilter = repo.trackedUsers.length > 0 ? 
-          ` [Tracking: ${repo.trackedUsers.map(u => `@${u}`).join(', ')}]` : '';
+        const userFilter = '' //repo.trackedUsers.length > 0 ? 
+          //` [Tracking: ${repo.trackedUsers.map(u => `@${u}`).join(', ')}]` : '';
         
         html += `<div class="repo-section">`;
         html += `<div class="repo-title"><strong>${index + 1}. ${repo.repoName}</strong> (${repo.prs.length} PRs${userFilter})</div>`;
@@ -581,8 +581,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let plainText = `📋 GitHub PRs to Review (${totalPRs} total):\n\n`;
     
     overviewData.forEach((repo, index) => {
-      const userFilter = repo.trackedUsers.length > 0 ? 
-        ` [Tracking: ${repo.trackedUsers.map(u => `@${u}`).join(', ')}]` : '';
+      const userFilter = ''//repo.trackedUsers.length > 0 ? 
+        //` [Tracking: ${repo.trackedUsers.map(u => `@${u}`).join(', ')}]` : '';
       
       plainText += `${index + 1}. ${repo.repoName} (${repo.prs.length} PRs${userFilter})\n`;
       repo.prs.forEach(pr => {

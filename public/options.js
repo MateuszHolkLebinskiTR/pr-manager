@@ -253,8 +253,8 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       
       if (prsNeedingReview.length > 0) {
-        const userFilter = repo.trackedUsers.length > 0 ? 
-          ` [Tracking: ${repo.trackedUsers.map(u => `@${u}`).join(', ')}]` : '';
+        const userFilter = ''//repo.trackedUsers.length > 0 ? 
+          //` [Tracking: ${repo.trackedUsers.map(u => `@${u}`).join(', ')}]` : '';
         
         teamsMessage += `**${repoCounter}. ${displayName}** (${prsNeedingReview.length} PRs${userFilter})\n`;
         prsNeedingReview.forEach(pr => {
