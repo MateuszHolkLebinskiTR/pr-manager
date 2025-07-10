@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PR Manager - Popup Demo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .popup-demo {
+            width: 400px;
+            margin: 0 auto;
+            border: 2px solid #007bff;
+            border-radius: 8px;
+            background: white;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .popup-header {
+            background: #007bff;
+            color: white;
+            padding: 12px;
+            border-radius: 6px 6px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .popup-body {
+            padding: 15px;
+        }
+        .quick-filters {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 15px;
+        }
+        .quick-filters h6 {
+            margin: 0 0 8px 0;
+            color: #495057;
+        }
+        .checkbox-item {
+            margin-bottom: 8px;
+        }
+        .checkbox-item:last-child {
+            margin-bottom: 0;
+        }
+        .before-after {
+            display: flex;
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .before-after > div {
+            flex: 1;
+        }
+        .comparison-card {
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        .comparison-header {
+            background: #e9ecef;
+            padding: 8px 12px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .comparison-body {
+            padding: 15px;
+        }
+        .highlight {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 4px;
+            padding: 8px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center mb-4">🔄 PR Manager - Popup with Quick Filters</h1>
+        
+        <div class="alert alert-success">
+            <strong>✨ New Feature:</strong> Quick filter checkboxes are now available directly in the popup! 
+            No need to go to settings every time you want to toggle filters.
+        </div>
+
+        <div class="popup-demo">
+            <div class="popup-header">
+                <h5 class="mb-0">🔄 PR Manager</h5>
+                <div>
+                    <button class="btn btn-outline-light btn-sm me-2">🔄</button>
+                    <button class="btn btn-outline-light btn-sm">⚙️</button>
+                </div>
+            </div>
+            
+            <div class="popup-body">
+                <div class="quick-filters">
+                    <h6>🔍 Quick Filters</h6>
+                    <div class="checkbox-item">
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="demo-filter-approvals">
+                            <label class="custom-control-label" for="demo-filter-approvals">
+                                <small>Only show PRs with less than 3 approvals</small>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="checkbox-item">
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="demo-filter-my-approval">
+                            <label class="custom-control-label" for="demo-filter-my-approval">
+                                <small>Hide PRs I've already approved</small>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-flex flex-column mb-3">
+                    <button class="btn btn-outline-primary btn-block mb-2">
+                        🔔 Check Now
+                    </button>
+                    <button class="btn btn-outline-secondary btn-block">
+                        📋 Show PR Overview
+                    </button>
+                </div>
+                
+                <div class="border rounded p-3 bg-light">
+                    <div class="text-center">
+                        <small class="text-muted">PR repositories will appear here</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="before-after">
+            <div>
+                <div class="comparison-card">
+                    <div class="comparison-header text-danger">❌ Before</div>
+                    <div class="comparison-body">
+                        <p><strong>To change filters:</strong></p>
+                        <ol>
+                            <li>Click Settings button</li>
+                            <li>Scroll to filtering section</li>
+                            <li>Change checkboxes</li>
+                            <li>Click Save Settings</li>
+                            <li>Go back to popup</li>
+                        </ol>
+                        <p class="text-muted small">5 steps, requires navigation</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div>
+                <div class="comparison-card">
+                    <div class="comparison-header text-success">✅ After</div>
+                    <div class="comparison-body">
+                        <p><strong>To change filters:</strong></p>
+                        <ol>
+                            <li>Toggle checkboxes in popup</li>
+                            <li>Filters apply immediately</li>
+                        </ol>
+                        <p class="text-success small">2 steps, instant feedback</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="highlight">
+            <h5>🎯 Key Benefits:</h5>
+            <ul class="mb-0">
+                <li><strong>Instant Access:</strong> Toggle filters without leaving the popup</li>
+                <li><strong>Real-time Updates:</strong> PR list refreshes immediately when filters change</li>
+                <li><strong>Synced Settings:</strong> Changes sync with the settings page automatically</li>
+                <li><strong>Better UX:</strong> Reduces clicks and improves workflow efficiency</li>
+            </ul>
+        </div>
+
+        <div class="alert alert-info mt-4">
+            <strong>💡 How it works:</strong><br>
+            • Checkboxes in the popup sync with the settings page<br>
+            • When you change a checkbox, it saves to extension storage<br>
+            • PR list automatically refreshes with the new filters<br>
+            • Status message confirms the filter change<br>
+            • Works consistently across all extension features
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -5,12 +5,13 @@ A modern Chrome extension for managing GitHub Pull Request notifications with ad
 ## ✨ Features
 
 ### 🔍 Advanced PR Filtering (Optional)
+- **Popup quick filters**: Toggle filters directly in the popup without going to settings
 - **Configurable approval filtering**: Optional setting to only show PRs with less than 3 approvals
 - **Personal approval filtering**: Optional setting to hide PRs you've already approved
 - **Flexible combinations**: Enable one filter, both filters, or neither based on your needs
 - **Review count display**: Shows approval counts (e.g., "2/3 ✅") when filtering is enabled
 - **Consistent filtering**: Applied across badge count, popup, notifications, and overview
-- **Settings-based control**: Enable/disable filters through the extension settings page
+- **Instant feedback**: Filters apply immediately when changed in popup
 
 ### 🔔 Smart Notifications
 - Customizable notification intervals (1-240 minutes)
@@ -118,6 +119,12 @@ The extension now supports optional advanced filtering that can be enabled in se
 - Popup PR list and counts
 - Desktop notifications
 - PR overview and Teams messages
+
+**Quick Filter Access:**
+- **Popup Filters**: Toggle filters directly in the extension popup
+- **Settings Page**: Configure filters in the extension settings (synced with popup)
+- **Instant Updates**: Changes apply immediately when toggled in popup
+- **Auto-Sync**: Popup checkboxes stay in sync with settings page
 
 This gives you complete control over which PRs you want to see based on your workflow preferences.
 

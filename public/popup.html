@@ -24,6 +24,27 @@
       </div>
     </div>
     
+    <!-- Quick Filter Options -->
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-header bg-light text-dark py-2">
+        <h6 class="card-title mb-0">🔍 Quick Filters</h6>
+      </div>
+      <div class="card-body py-2">
+        <div class="custom-control custom-checkbox mb-2">
+          <input type="checkbox" class="custom-control-input" id="popup-filter-approvals">
+          <label class="custom-control-label" for="popup-filter-approvals">
+            <small>Only show PRs with less than 3 approvals</small>
+          </label>
+        </div>
+        <div class="custom-control custom-checkbox">
+          <input type="checkbox" class="custom-control-input" id="popup-filter-my-approval">
+          <label class="custom-control-label" for="popup-filter-my-approval">
+            <small>Hide PRs I've already approved</small>
+          </label>
+        </div>
+      </div>
+    </div>
+    
     <!-- Action Buttons -->
     <div class="d-flex flex-column mb-3">
       <button id="check-now" class="btn btn-outline-primary btn-block mb-2">

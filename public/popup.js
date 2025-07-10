@@ -40,12 +40,28 @@ function renderPRList(prPages) {
     return;
   }
   
-  chrome.storage.sync.get({ githubToken: '', filterByApprovals: false, filterByMyApproval: false }, async (settings) => {
+  chrome.storage.sync.get({ githubToken: '' }, async (settings) => {
+    // Get current filter settings from popup checkboxes if available, otherwise from storage
+    const popupFilterApprovals = document.getElementById('popup-filter-approvals');
+    const popupFilterMyApproval = document.getElementById('popup-filter-my-approval');
+    
+    const currentFilterSettings = await new Promise(resolve => {
+      chrome.storage.sync.get({ filterByApprovals: false, filterByMyApproval: false }, (stored) => {
+        resolve({
+          filterByApprovals: popupFilterApprovals ? popupFilterApprovals.checked : stored.filterByApprovals,
+          filterByMyApproval: popupFilterMyApproval ? popupFilterMyApproval.checked : stored.filterByMyApproval
+        });
+      });
+    });
+    
+    // Merge settings with current filter state
+    const combinedSettings = { ...settings, ...currentFilterSettings };
+    
     let user = null;
-    if (settings.githubToken) {
+    if (combinedSettings.githubToken) {
       try {
         const res = await fetch('https://api.github.com/user', {
-          headers: { Authorization: `token ${settings.githubToken}` }
+          headers: { Authorization: `token ${combinedSettings.githubToken}` }
         });
         user = await res.json();
       } catch (e) {
@@ -58,13 +74,13 @@ function renderPRList(prPages) {
       const url = repo.url || repo; // Handle both old and new format
       let pendingCount = 0;
       
-      if (user && settings.githubToken) {
+      if (user && combinedSettings.githubToken) {
         const match = url.match(/github.com\/(.+?)\/(.+?)\/pulls/);
         if (match) {
           const [_, owner, repoName] = match;
           try {
             const res = await fetch(`https://api.github.com/repos/${owner}/${repoName}/pulls?state=open`, {
-              headers: { Authorization: `token ${settings.githubToken}` }
+              headers: { Authorization: `token ${combinedSettings.githubToken}` }
             });
             if (res.ok) {
               const allPRs = await res.json();
@@ -79,12 +95,12 @@ function renderPRList(prPages) {
               
               // Apply advanced filtering only if enabled in settings
               let prsNeedingReview = filteredPRs;
-              if (settings.filterByApprovals || settings.filterByMyApproval) {
+              if (combinedSettings.filterByApprovals || combinedSettings.filterByMyApproval) {
                 prsNeedingReview = [];
                 for (const pr of filteredPRs) {
                   try {
                     const reviewsRes = await fetch(`https://api.github.com/repos/${owner}/${repoName}/pulls/${pr.number}/reviews`, {
-                      headers: { Authorization: `token ${settings.githubToken}` }
+                      headers: { Authorization: `token ${combinedSettings.githubToken}` }
                     });
                     if (reviewsRes.ok) {
                       const reviews = await reviewsRes.json();
@@ -101,11 +117,11 @@ function renderPRList(prPages) {
                       // Apply filtering based on settings
                       let includeThisPR = true;
                       
-                      if (settings.filterByApprovals && pr.approvals >= 3) {
+                      if (combinedSettings.filterByApprovals && pr.approvals >= 3) {
                         includeThisPR = false; // Exclude PRs with 3+ approvals
                       }
                       
-                      if (settings.filterByMyApproval && userHasApproved) {
+                      if (combinedSettings.filterByMyApproval && userHasApproved) {
                         includeThisPR = false; // Exclude PRs already approved by user
                       }
                       
@@ -197,6 +213,48 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+
+  // Initialize popup filter checkboxes
+  const popupFilterApprovals = document.getElementById('popup-filter-approvals');
+  const popupFilterMyApproval = document.getElementById('popup-filter-my-approval');
+  
+  // Load current filter settings and sync with checkboxes
+  function loadFilterSettings() {
+    chrome.storage.sync.get({ filterByApprovals: false, filterByMyApproval: false }, (settings) => {
+      if (popupFilterApprovals) {
+        popupFilterApprovals.checked = settings.filterByApprovals;
+      }
+      if (popupFilterMyApproval) {
+        popupFilterMyApproval.checked = settings.filterByMyApproval;
+      }
+    });
+  }
+  
+  // Save filter settings when checkboxes change
+  function saveFilterSettings() {
+    const settings = {
+      filterByApprovals: popupFilterApprovals ? popupFilterApprovals.checked : false,
+      filterByMyApproval: popupFilterMyApproval ? popupFilterMyApproval.checked : false
+    };
+    
+    chrome.storage.sync.set(settings, () => {
+      console.log('Filter settings saved:', settings);
+      // Reload PR list to apply new filters
+      loadPRPages();
+      showStatus('Filters updated! 🔍', 'info');
+    });
+  }
+  
+  // Add event listeners for filter checkboxes
+  if (popupFilterApprovals) {
+    popupFilterApprovals.addEventListener('change', saveFilterSettings);
+  }
+  if (popupFilterMyApproval) {
+    popupFilterMyApproval.addEventListener('change', saveFilterSettings);
+  }
+  
+  // Load filter settings on popup open
+  loadFilterSettings();
 
   // Refresh button
   const refreshBtn = document.getElementById('refresh-list');
