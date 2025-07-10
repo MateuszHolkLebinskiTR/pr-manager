@@ -312,7 +312,9 @@ async function checkPRsAndNotify() {
       }
       
       // Update badge count with filtered total
-      console.log(`Setting badge count to: ${totalPending}`);
+      console.log(`Setting badge count to: ${totalPending} (filtered from all PRs across repositories)`);
+      console.log(`Filter settings used: approvals=${settings.filterByApprovals}, myApproval=${settings.filterByMyApproval}, wip=${settings.filterByWip}`);
+      console.log(`Total pending PRs across all repositories: ${totalPending}`);
       chrome.action.setBadgeText({ text: totalPending > 0 ? String(totalPending) : '' });
       chrome.action.setBadgeBackgroundColor({ color: '#ff0000' });
     });
@@ -350,10 +352,14 @@ chrome.notifications.onClicked.addListener((notificationId) => {
 // Listen for messages from popup/options
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === 'settings-updated') {
-    console.log('Settings updated, recreating alarm');
+    console.log('Settings updated, recreating alarm and triggering check');
     getNotificationSettings((settings) => {
       chrome.alarms.clear('checkPRs');
       chrome.alarms.create('checkPRs', { periodInMinutes: settings.interval });
+      // Also trigger immediate check to update badge with new filter settings
+      setTimeout(() => {
+        checkPRsAndNotify();
+      }, 1000);
     });
   } else if (message.type === 'check-now') {
     console.log('Manual check requested');
@@ -362,6 +368,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   } else if (message.type === 'update-badge') {
     console.log('Badge update requested with count:', message.count);
     const count = message.count || 0;
+    console.log(`Total pending PRs across all repositories: ${count}`);
     chrome.action.setBadgeText({ text: count > 0 ? String(count) : '' });
     chrome.action.setBadgeBackgroundColor({ color: '#ff0000' });
     sendResponse({ success: true });

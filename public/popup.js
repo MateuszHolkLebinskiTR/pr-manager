@@ -272,6 +272,18 @@ document.addEventListener('DOMContentLoaded', () => {
       console.log('Filter settings saved:', settings);
       // Reload PR list to apply new filters (this will also update badge)
       loadPRPages();
+      
+      // Trigger background re-check to update badge counter with new filters
+      chrome.runtime.sendMessage({ 
+        type: 'check-now' 
+      }, (response) => {
+        if (chrome.runtime.lastError) {
+          console.warn('Failed to trigger background re-check:', chrome.runtime.lastError);
+        } else {
+          console.log('Background re-check triggered for filter update');
+        }
+      });
+      
       showStatus('Filters updated! Badge counter synchronized 🔍', 'info');
     });
   }
