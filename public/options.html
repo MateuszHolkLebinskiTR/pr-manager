@@ -4,134 +4,168 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PR Manager Settings</title>
-  <link rel="stylesheet" href="../src/style.css" />
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../src/bootstrap-custom.css" />
 </head>
 <body>
-  <div id="options-app">
-    <div class="card-header">
-      <h2 class="card-title">⚙️ PR Manager Settings</h2>
-    </div>
-    
-    <div class="card">
-      <div class="card-header">
-        <h3 class="card-title">🔔 Notification Settings</h3>
+  <div class="container mt-4">
+    <div id="options-app" class="card border-0 shadow">
+      <!-- Header -->
+      <div class="card-header bg-primary text-white">
+        <h4 class="card-title mb-0">⚙️ PR Manager Settings</h4>
       </div>
-      <form id="settings-form">
-        <div class="form-group">
-          <label>
-            <span>Notification Interval (minutes)</span>
-            <input type="number" id="interval" min="1" max="240" placeholder="15" />
-            <small>How often to check for new PR notifications</small>
-          </label>
+      
+      <!-- Notification Settings -->
+      <div class="card-body">
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-header bg-info text-white">
+            <h5 class="card-title mb-0">🔔 Notification Settings</h5>
+          </div>
+          <div class="card-body">
+            <form id="settings-form">
+              <div class="form-group">
+                <label for="interval">Notification Interval (minutes)</label>
+                <input type="number" class="form-control" id="interval" min="1" max="240" placeholder="15" />
+                <small class="form-text text-muted">How often to check for new PR notifications</small>
+              </div>
+              
+              <div class="form-group">
+                <label for="working-hours">Working Hours</label>
+                <input type="text" class="form-control" id="working-hours" placeholder="09:00-18:00" />
+                <small class="form-text text-muted">Only show notifications during these hours (24-hour format)</small>
+              </div>
+              
+              <div class="form-group">
+                <div class="custom-control custom-checkbox">
+                  <input type="checkbox" class="custom-control-input" id="show-history" />
+                  <label class="custom-control-label" for="show-history">Show Notification History</label>
+                </div>
+              </div>
+              
+              <!-- Advanced PR Filtering -->
+              <div class="form-group">
+                <h6 class="text-secondary mb-2">🔍 Advanced PR Filtering</h6>
+                <div class="custom-control custom-checkbox mb-2">
+                  <input type="checkbox" class="custom-control-input" id="filter-by-approvals" />
+                  <label class="custom-control-label" for="filter-by-approvals">
+                    Only show PRs with less than 3 approvals
+                  </label>
+                  <small class="form-text text-muted">Filter out PRs that already have 3+ approvals</small>
+                </div>
+                <div class="custom-control custom-checkbox">
+                  <input type="checkbox" class="custom-control-input" id="filter-by-my-approval" />
+                  <label class="custom-control-label" for="filter-by-my-approval">
+                    Hide PRs I've already approved
+                  </label>
+                  <small class="form-text text-muted">Don't show PRs you've already reviewed and approved</small>
+                </div>
+              </div>
+              
+              <div class="form-group">
+                <label for="custom-message">Custom Notification Message</label>
+                <input type="text" class="form-control" id="custom-message" placeholder="You have pending PR reviews!" />
+                <small class="form-text text-muted">Customize the notification message text</small>
+              </div>
+            </form>
+          </div>
         </div>
-        
-        <div class="form-group">
-          <label>
-            <span>Working Hours</span>
-            <input type="text" id="working-hours" placeholder="09:00-18:00" />
-            <small>Only show notifications during these hours (24-hour format)</small>
-          </label>
-        </div>
-        
-        <div class="form-group">
-          <label class="checkbox-label">
-            <input type="checkbox" id="show-history" />
-            <span>Show Notification History</span>
-          </label>
-        </div>
-        
-        <div class="form-group">
-          <label>
-            <span>Custom Notification Message</span>
-            <input type="text" id="custom-message" placeholder="You have pending PR reviews!" />
-            <small>Customize the notification message text</small>
-          </label>
-        </div>
-        </label>
-      </form>
-    </div>
-    
-    <div class="card">
-      <div class="card-header">
-        <h3 class="card-title">🔑 GitHub Integration</h3>
-      </div>
-      <div class="form-group">
-        <label>
-          <span>GitHub Personal Access Token</span>
-          <input type="password" id="github-token" autocomplete="off" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" />
-          <small>
-            Generate a token at 
-            <a href="https://github.com/settings/tokens" target="_blank">GitHub Settings</a> 
-            with <strong>repo</strong> and <strong>read:user</strong> scopes
-          </small>
-        </label>
-      </div>
-    </div>
 
-    <div class="card">
-      <div class="card-header">
-        <h3 class="card-title">📋 Repository Management</h3>
-        <button id="add-repository" class="secondary">
-          <span>➕</span>
-          Add Repository
-        </button>
-      </div>
-      <div id="repository-list" class="repository-list">
-        <!-- Repository sections will be dynamically added here -->
-      </div>
-    </div>
-    
-    <div class="button-group space-between">
-      <button type="submit" form="settings-form" class="primary">
-        <span>💾</span>
-        Save Settings
-      </button>
-      <div class="flex gap-2">
-        <button id="export-pr-list" class="secondary">
-          <span>📤</span>
-          Export
-        </button>
-        <button id="import-pr-list" class="secondary">
-          <span>📥</span>
-          Import
-        </button>
-        <button id="generate-ms-teams" class="secondary">
-          <span>💬</span>
-          Teams Message
-        </button>
-        <button id="preview-teams-message" class="secondary">
-          <span>👀</span>
-          Preview
-        </button>
-      </div>
-    </div>
-    
-    <div id="status-message" class="notification info hidden">
-      <span id="status-text"></span>
-    </div>
-    
-    <div id="teams-preview-section" class="card hidden">
-      <div class="card-header">
-        <h3 class="card-title">👀 Teams Message Preview</h3>
-      </div>
-      <div class="preview-container">
-        <pre id="teams-preview-content"></pre>
-        <div class="button-group centered">
-          <button id="copy-preview" class="primary">
-            <span>📋</span>
-            Copy to Clipboard
+        <!-- GitHub Integration -->
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-header bg-success text-white">
+            <h5 class="card-title mb-0">🔑 GitHub Integration</h5>
+          </div>
+          <div class="card-body">
+            <div class="form-group">
+              <label for="github-token">GitHub Personal Access Token</label>
+              <input type="password" class="form-control" id="github-token" autocomplete="off" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" />
+              <small class="form-text text-muted">
+                Generate a token at 
+                <a href="https://github.com/settings/tokens" target="_blank">GitHub Settings</a> 
+                with <strong>repo</strong> and <strong>read:user</strong> scopes
+              </small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Repository Management -->
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">📋 Repository Management</h5>
+            <button id="add-repository" class="btn btn-outline-dark btn-sm">
+              <span class="mr-2">➕</span>
+              Add Repository
+            </button>
+          </div>
+          <div class="card-body">
+            <div id="repository-list" class="repository-list">
+              <!-- Repository sections will be dynamically added here -->
+            </div>
+          </div>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="d-flex justify-content-between flex-wrap">
+          <button type="submit" form="settings-form" class="btn btn-primary mb-2">
+            <span class="mr-2">💾</span>
+            Save Settings
           </button>
+          <div class="btn-group mb-2" role="group">
+            <button id="export-pr-list" class="btn btn-outline-secondary">
+              <span class="mr-2">📤</span>
+              Export
+            </button>
+            <button id="import-pr-list" class="btn btn-outline-secondary">
+              <span class="mr-2">📥</span>
+              Import
+            </button>
+            <button id="generate-ms-teams" class="btn btn-outline-secondary">
+              <span class="mr-2">💬</span>
+              Teams Message
+            </button>
+            <button id="preview-teams-message" class="btn btn-outline-secondary">
+              <span class="mr-2">👀</span>
+              Preview
+            </button>
+          </div>
+        </div>
+        
+        <!-- Status Message -->
+        <div id="status-message" class="alert alert-info mt-3" role="alert" style="display: none;">
+          <span id="status-text"></span>
+        </div>
+        
+        <!-- Teams Preview Section -->
+        <div id="teams-preview-section" class="card border-0 shadow-sm mt-4" style="display: none;">
+          <div class="card-header bg-secondary text-white">
+            <h5 class="card-title mb-0">👀 Teams Message Preview</h5>
+          </div>
+          <div class="card-body">
+            <pre id="teams-preview-content" class="bg-light p-3 rounded"></pre>
+            <div class="text-center mt-3">
+              <button id="copy-preview" class="btn btn-primary">
+                <span class="mr-2">📋</span>
+                Copy to Clipboard
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Notification History -->
+        <div id="notification-history-section" class="card border-0 shadow-sm mt-4" style="display: none;">
+          <div class="card-header bg-dark text-white">
+            <h5 class="card-title mb-0">📋 Notification History</h5>
+          </div>
+          <div class="card-body">
+            <ul id="notification-history-list" class="list-group list-group-flush"></ul>
+          </div>
         </div>
       </div>
-    </div>
-    
-    <div id="notification-history-section" class="card hidden">
-      <div class="card-header">
-        <h3 class="card-title">📋 Notification History</h3>
-      </div>
-      <ul id="notification-history-list"></ul>
     </div>
   </div>
+  
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
   <script src="options.js"></script>
 </body>
 </html>

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PR Manager - Advanced Filtering Test</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .test-card {
+            margin-bottom: 20px;
+        }
+        .test-result {
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .test-pass {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .test-fail {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .pr-item {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        .approval-count {
+            font-weight: bold;
+            color: #28a745;
+        }
+        .approval-count.low {
+            color: #ffc107;
+        }
+        .approval-count.zero {
+            color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center mb-4">🔍 PR Manager - Advanced Filtering Test</h1>
+        
+        <div class="alert alert-info">
+            <strong>Testing Advanced PR Filtering:</strong> This page tests the filtering logic that shows only PRs with less than 3 approvals and not approved by the current user.
+        </div>
+
+        <div class="card test-card">
+            <div class="card-header">
+                <h5>Test Scenarios</h5>
+            </div>
+            <div class="card-body">
+                <div id="test-results">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Should be INCLUDED (shown in popup):</h6>
+                            <div class="pr-item">
+                                <strong>PR #1:</strong> New feature implementation<br>
+                                <small>by @john-doe | Created: 2024-01-15</small><br>
+                                <span class="approval-count zero">0/3 approvals ✅</span> | Not approved by you ✅
+                            </div>
+                            <div class="pr-item">
+                                <strong>PR #2:</strong> Bug fix for login issue<br>
+                                <small>by @jane-smith | Created: 2024-01-14</small><br>
+                                <span class="approval-count low">1/3 approvals ✅</span> | Not approved by you ✅
+                            </div>
+                            <div class="pr-item">
+                                <strong>PR #3:</strong> Update dependencies<br>
+                                <small>by @bob-wilson | Created: 2024-01-13</small><br>
+                                <span class="approval-count low">2/3 approvals ✅</span> | Not approved by you ✅
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Should be EXCLUDED (hidden from popup):</h6>
+                            <div class="pr-item" style="opacity: 0.5;">
+                                <strong>PR #4:</strong> Refactor authentication<br>
+                                <small>by @alice-cooper | Created: 2024-01-12</small><br>
+                                <span class="approval-count">3/3 approvals ❌</span> | Fully approved
+                            </div>
+                            <div class="pr-item" style="opacity: 0.5;">
+                                <strong>PR #5:</strong> Add new API endpoints<br>
+                                <small>by @charlie-brown | Created: 2024-01-11</small><br>
+                                <span class="approval-count low">2/3 approvals ❌</span> | Approved by you
+                            </div>
+                            <div class="pr-item" style="opacity: 0.5;">
+                                <strong>PR #6:</strong> UI improvements<br>
+                                <small>by @diana-prince | Created: 2024-01-10</small><br>
+                                <span class="approval-count">4/3 approvals ❌</span> | Fully approved
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card test-card">
+            <div class="card-header">
+                <h5>Filtering Logic Summary</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>✅ Include PR when:</h6>
+                        <ul>
+                            <li>Approval count < 3 <strong>AND</strong></li>
+                            <li>Current user has NOT approved it</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>❌ Exclude PR when:</h6>
+                        <ul>
+                            <li>Approval count >= 3 <strong>OR</strong></li>
+                            <li>Current user has already approved it</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card test-card">
+            <div class="card-header">
+                <h5>How to Test</h5>
+            </div>
+            <div class="card-body">
+                <ol>
+                    <li>Open the PR Manager extension popup</li>
+                    <li>Add a repository URL (format: https://github.com/owner/repo/pulls)</li>
+                    <li>Add your GitHub token in the options page</li>
+                    <li>Click "Check Now" to see filtered PRs</li>
+                    <li>Only PRs with < 3 approvals that you haven't approved should appear</li>
+                    <li>The badge count should match the number of filtered PRs</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="card test-card">
+            <div class="card-header">
+                <h5>Expected Results</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-success">
+                    <strong>✅ Badge Count:</strong> Should show only PRs that need your review (< 3 approvals & not approved by you)
+                </div>
+                <div class="alert alert-info">
+                    <strong>📋 PR Overview:</strong> Should display approval counts like "2/3 ✅" for each PR
+                </div>
+                <div class="alert alert-warning">
+                    <strong>🔔 Notifications:</strong> Should mention "PRs needing review" with the filtering criteria
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

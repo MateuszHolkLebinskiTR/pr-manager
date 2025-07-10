@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Popup Test</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="src/bootstrap-custom.css">
+</head>
+<body>
+  <div class="container mt-4">
+    <h1>Popup Test Page</h1>
+    <p>This page tests the popup functionality outside of the Chrome extension context.</p>
+    
+    <div id="popup-app" class="container-fluid p-3 border rounded" style="width: 400px;">
+      <!-- Header -->
+      <div class="card border-0 shadow-sm mb-3">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+          <h5 class="card-title mb-0">🔄 PR Manager</h5>
+          <div class="btn-group" role="group">
+            <button id="refresh-list" class="btn btn-outline-light btn-sm" title="Refresh">
+              🔄
+            </button>
+            <button id="open-settings" class="btn btn-outline-light btn-sm" title="Settings">
+              ⚙️
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Action Buttons -->
+      <div class="d-flex flex-column mb-3">
+        <button id="check-now" class="btn btn-outline-primary btn-block mb-2">
+          <span class="mr-2">🔔</span>
+          Check Now
+        </button>
+        
+        <button id="show-pr-overview" class="btn btn-outline-secondary btn-block">
+          <span class="mr-2">📋</span>
+          Show PR Overview
+        </button>
+      </div>
+      
+      <!-- PR List -->
+      <div id="pr-list" class="mb-3">
+        <div class="pr-page-item">
+          <span class="d-flex align-items-center">
+            <a href="#" class="text-decoration-none mr-2">📁 test/repository</a>
+            <span class="pr-pending-count">2</span>
+          </span>
+          <button class="btn btn-outline-danger btn-sm">🗑️</button>
+        </div>
+      </div>
+      
+      <!-- PR Overview Section -->
+      <div id="pr-overview-section" class="card border-0 shadow-sm mb-3" style="display: none;">
+        <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+          <h6 class="card-title mb-0">📋 PR Overview</h6>
+          <button id="close-pr-overview" class="btn btn-outline-light btn-sm">
+            ✕
+          </button>
+        </div>
+        <div class="card-body">
+          <div id="pr-overview-content" class="pr-overview-content mb-3"></div>
+          <div class="text-center">
+            <button id="copy-pr-overview" class="btn btn-outline-secondary">
+              <span class="mr-2">📋</span>
+              Copy to Clipboard
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Status Message -->
+      <div id="status-message" class="alert alert-info" role="alert" style="display: none;">
+        <span id="status-text"></span>
+      </div>
+    </div>
+  </div>
+  
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  
+  <script>
+    // Mock Chrome extension APIs for testing
+    window.chrome = {
+      storage: {
+        sync: {
+          get: function(keys, callback) {
+            console.log('Mock storage.sync.get called with:', keys);
+            callback({ repositories: [] });
+          }
+        }
+      },
+      runtime: {
+        lastError: null,
+        openOptionsPage: function() {
+          console.log('Mock openOptionsPage called');
+          alert('Would open options page');
+        },
+        sendMessage: function(message, callback) {
+          console.log('Mock sendMessage called with:', message);
+          setTimeout(() => callback({ success: true }), 1000);
+        }
+      }
+    };
+    
+    // Load the actual popup script
+    const script = document.createElement('script');
+    script.src = 'public/popup.js';
+    document.head.appendChild(script);
+  </script>
+</body>
+</html>

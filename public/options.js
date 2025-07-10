@@ -5,12 +5,20 @@ function showStatus(message, type = 'info') {
   const statusEl = document.getElementById('status-message');
   const statusText = document.getElementById('status-text');
   
-  statusEl.className = `notification ${type}`;
+  // Map custom types to Bootstrap alert classes
+  const bootstrapTypes = {
+    'info': 'alert-info',
+    'success': 'alert-success',
+    'warning': 'alert-warning',
+    'error': 'alert-danger'
+  };
+  
+  statusEl.className = `alert ${bootstrapTypes[type] || 'alert-info'}`;
   statusText.textContent = message;
-  statusEl.classList.remove('hidden');
+  statusEl.style.display = 'block';
   
   setTimeout(() => {
-    statusEl.classList.add('hidden');
+    statusEl.style.display = 'none';
   }, 3000);
 }
 
@@ -21,6 +29,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const showHistoryInput = document.getElementById('show-history');
   const customMessageInput = document.getElementById('custom-message');
   const githubTokenInput = document.getElementById('github-token');
+  const filterByApprovalsInput = document.getElementById('filter-by-approvals');
+  const filterByMyApprovalInput = document.getElementById('filter-by-my-approval');
 
   // Load existing settings
   chrome.storage.sync.get({
@@ -29,13 +39,17 @@ document.addEventListener('DOMContentLoaded', () => {
     showHistory: false,
     customMessage: '',
     githubToken: '',
-    repositories: [] // New structure for repositories with tracked users
+    repositories: [], // New structure for repositories with tracked users
+    filterByApprovals: false,
+    filterByMyApproval: false
   }, (data) => {
     intervalInput.value = data.interval;
     workingHoursInput.value = data.workingHours;
     showHistoryInput.checked = data.showHistory;
     customMessageInput.value = data.customMessage;
     githubTokenInput.value = data.githubToken;
+    filterByApprovalsInput.checked = data.filterByApprovals;
+    filterByMyApprovalInput.checked = data.filterByMyApproval;
     
     // Load repositories
     loadRepositories(data.repositories);
@@ -53,7 +67,9 @@ document.addEventListener('DOMContentLoaded', () => {
       workingHours: workingHoursInput.value,
       showHistory: showHistoryInput.checked,
       customMessage: customMessageInput.value,
-      githubToken: githubTokenInput.value
+      githubToken: githubTokenInput.value,
+      filterByApprovals: filterByApprovalsInput.checked,
+      filterByMyApproval: filterByMyApprovalInput.checked
     };
     
     chrome.storage.sync.set(settings, () => {
@@ -184,7 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const teamsMessage = await generateTeamsMessage();
       document.getElementById('teams-preview-content').textContent = teamsMessage;
-      document.getElementById('teams-preview-section').classList.remove('hidden');
+      document.getElementById('teams-preview-section').style.display = 'block';
       showStatus('Preview generated! 👀', 'success');
     } catch (error) {
       showStatus(error.message + ' ❌', 'error');
@@ -217,7 +233,7 @@ document.addEventListener('DOMContentLoaded', () => {
       showStatus('Teams message copied to clipboard! 📋✅', 'success');
       
       // Also update preview if it's visible
-      if (!document.getElementById('teams-preview-section').classList.contains('hidden')) {
+      if (document.getElementById('teams-preview-section').style.display !== 'none') {
         document.getElementById('teams-preview-content').textContent = teamsMessage;
       }
     } catch (error) {
@@ -248,44 +264,44 @@ document.addEventListener('DOMContentLoaded', () => {
   
   function createRepositoryElement(repo, index) {
     const div = document.createElement('div');
-    div.className = 'repository-item';
+    div.className = 'card border-secondary mb-3';
     div.setAttribute('data-index', index);
     
     const repoName = repo.url.match(/github\.com\/(.+?)\/(.+?)\/pulls/);
     const displayName = repoName ? `${repoName[1]}/${repoName[2]}` : repo.url;
     
     div.innerHTML = `
-      <div class="repository-header">
+      <div class="card-header bg-light d-flex justify-content-between align-items-center">
         <div>
-          <h3 class="repository-title">📁 ${displayName}</h3>
-          <p class="repository-url">${repo.url}</p>
+          <h5 class="card-title mb-1">📁 ${displayName}</h5>
+          <p class="card-text text-muted small mb-0">${repo.url}</p>
         </div>
-        <div class="repository-controls">
-          <button class="remove-repository danger" data-index="${index}">
-            <span>🗑️</span>
-            Remove
-          </button>
-        </div>
+        <button class="btn btn-outline-danger btn-sm remove-repository" data-index="${index}">
+          <span class="mr-2">🗑️</span>
+          Remove
+        </button>
       </div>
       
-      <div class="tracked-users-section">
-        <div class="tracked-users-header">
-          <h4>👥 Tracked Users (${repo.trackedUsers.length})</h4>
+      <div class="card-body">
+        <div class="mb-3">
+          <h6 class="text-primary">👥 Tracked Users (${repo.trackedUsers.length})</h6>
+          <div class="d-flex flex-wrap" id="user-tags-${index}">
+            ${repo.trackedUsers.map(user => `
+              <span class="badge badge-secondary mr-2 mb-2 d-flex align-items-center">
+                @${user}
+                <button class="btn btn-sm btn-link text-white p-0 ml-1 remove-user" data-repo="${index}" data-user="${user}" style="line-height: 1;">✕</button>
+              </span>
+            `).join('')}
+          </div>
         </div>
-        <div class="user-tags" id="user-tags-${index}">
-          ${repo.trackedUsers.map(user => `
-            <span class="user-tag">
-              @${user}
-              <button class="remove-user" data-repo="${index}" data-user="${user}">✕</button>
-            </span>
-          `).join('')}
-        </div>
-        <div class="add-user-input">
-          <input type="text" placeholder="GitHub username" id="user-input-${index}" />
-          <button class="add-user secondary" data-index="${index}">
-            <span>➕</span>
-            Add User
-          </button>
+        <div class="input-group">
+          <input type="text" class="form-control" placeholder="GitHub username" id="user-input-${index}" />
+          <div class="input-group-append">
+            <button class="btn btn-outline-secondary add-user" data-index="${index}">
+              <span class="mr-2">➕</span>
+              Add User
+            </button>
+          </div>
         </div>
       </div>
     `;
@@ -413,7 +429,14 @@ document.addEventListener('DOMContentLoaded', () => {
         list.innerHTML = '';
         data.notificationHistory.slice(-50).reverse().forEach(item => {
           const li = document.createElement('li');
-          li.innerHTML = `<a href="${item.prUrl}" target="_blank">${item.prTitle}</a> [${item.type}] <small>${new Date(item.time).toLocaleString()}</small>`;
+          li.className = 'list-group-item d-flex justify-content-between align-items-center';
+          li.innerHTML = `
+            <div>
+              <a href="${item.prUrl}" target="_blank" class="text-decoration-none">${item.prTitle}</a>
+              <small class="text-muted d-block">${new Date(item.time).toLocaleString()}</small>
+            </div>
+            <span class="badge badge-${item.type === 'new' ? 'success' : 'info'} badge-pill">${item.type}</span>
+          `;
           list.appendChild(li);
         });
       });

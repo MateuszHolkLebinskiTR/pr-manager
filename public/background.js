@@ -12,7 +12,9 @@ function getNotificationSettings(cb) {
     workingHours: '09:00-18:00',
     showHistory: false,
     githubToken: '', // Add githubToken to defaults
-    token: '' // Also check for 'token' key for backwards compatibility
+    token: '', // Also check for 'token' key for backwards compatibility
+    filterByApprovals: false,
+    filterByMyApproval: false
   }, (settings) => {
     // Use either githubToken or token field
     if (!settings.githubToken && settings.token) {
@@ -141,21 +143,81 @@ async function checkPRsAndNotify() {
           console.log(`Filtered to ${filteredPRs.length} PRs from tracked users: ${repo.trackedUsers.join(', ')}`);
         }
         
-        // Count filtered PRs for badge
-        totalPending += filteredPRs.length;
+        // Apply advanced filtering only if enabled in settings
+        let prsNeedingReview = filteredPRs;
+        if (settings.filterByApprovals || settings.filterByMyApproval) {
+          prsNeedingReview = [];
+          for (const pr of filteredPRs) {
+            try {
+              const match = url.match(/github.com\/(.+?)\/(.+?)\/pulls/);
+              if (match) {
+                const [_, owner, repoName] = match;
+                const reviewsRes = await fetch(`https://api.github.com/repos/${owner}/${repoName}/pulls/${pr.number}/reviews`, {
+                  headers: { Authorization: `token ${settings.githubToken}` }
+                });
+                if (reviewsRes.ok) {
+                  const reviews = await reviewsRes.json();
+                  
+                  // Count total approvals
+                  const approvals = reviews.filter(review => review.state === 'APPROVED');
+                  pr.approvals = approvals.length;
+                  
+                  // Check if current user has approved
+                  const userHasApproved = approvals.some(review => 
+                    review.user.login === user.login
+                  );
+                  
+                  // Apply filtering based on settings
+                  let includeThisPR = true;
+                  
+                  if (settings.filterByApprovals && pr.approvals >= 3) {
+                    includeThisPR = false; // Exclude PRs with 3+ approvals
+                  }
+                  
+                  if (settings.filterByMyApproval && userHasApproved) {
+                    includeThisPR = false; // Exclude PRs already approved by user
+                  }
+                  
+                  if (includeThisPR) {
+                    prsNeedingReview.push(pr);
+                  }
+                }
+              }
+            } catch (e) {
+              console.warn('Failed to fetch reviews for PR', pr.number, e);
+              // If we can't fetch reviews, include the PR to be safe
+              prsNeedingReview.push(pr);
+            }
+          }
+        }
+        
+        // Count filtered PRs for badge (only those needing review)
+        totalPending += prsNeedingReview.length;
         
         // Show notification about filtered PRs
-        if (filteredPRs.length > 0) {
+        if (prsNeedingReview.length > 0) {
           const repoName = url.split('/').slice(-3, -1).join('/');
           const userFilter = repo.trackedUsers && repo.trackedUsers.length > 0 
             ? ` from tracked users` 
             : '';
           
+          // Create notification message based on filtering settings
+          let notificationMessage = `Found ${prsNeedingReview.length} open PRs${userFilter} in ${repoName}`;
+          let notificationTitle = `PR Manager: ${prsNeedingReview.length} Open PRs`;
+          
+          if (settings.filterByApprovals || settings.filterByMyApproval) {
+            notificationTitle = `PR Manager: ${prsNeedingReview.length} PRs Need Review`;
+            const filterParts = [];
+            if (settings.filterByApprovals) filterParts.push('<3 approvals');
+            if (settings.filterByMyApproval) filterParts.push('not approved by you');
+            notificationMessage = `Found ${prsNeedingReview.length} PRs needing review${userFilter} in ${repoName} (${filterParts.join(' & ')})`;
+          }
+          
           chrome.notifications.create({
             type: 'basic',
             iconUrl: 'icon-128.png',
-            title: `PR Manager: ${filteredPRs.length} Open PRs`,
-            message: `Found ${filteredPRs.length} open PRs${userFilter} in ${repoName}`,
+            title: notificationTitle,
+            message: notificationMessage,
             priority: 1,
             isClickable: true
           }, (notificationId) => {
@@ -164,7 +226,7 @@ async function checkPRsAndNotify() {
         }
         
         // Original logic for review requests (still useful for personal review notifications)
-        const reviewRequests = filteredPRs.filter(pr => {
+        const reviewRequests = prsNeedingReview.filter(pr => {
           if (!pr.requested_reviewers) return false;
           return pr.requested_reviewers.some(r => r.login === user.login);
         });

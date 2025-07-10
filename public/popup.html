@@ -4,59 +4,69 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PR Manager</title>
-  <link rel="stylesheet" href="../src/style.css" />
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../src/bootstrap-custom.css" />
 </head>
 <body>
-  <div id="popup-app">
-    <div class="card-header">
-      <h2 class="card-title">🔄 PR Manager</h2>
-      <div class="flex items-center gap-2">
-        <button id="refresh-list" class="icon-button ghost" title="Refresh">
-          <span>🔄</span>
-        </button>
-        <button id="open-settings" class="icon-button ghost" title="Settings">
-          <span>⚙️</span>
-        </button>
+  <div id="popup-app" class="container-fluid p-3" style="width: 400px;">
+    <!-- Header -->
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">🔄 PR Manager</h5>
+        <div class="btn-group" role="group">
+          <button id="refresh-list" class="btn btn-outline-light btn-sm" title="Refresh">
+            🔄
+          </button>
+          <button id="open-settings" class="btn btn-outline-light btn-sm" title="Settings">
+            ⚙️
+          </button>
+        </div>
       </div>
     </div>
     
-    
-    <div class="button-group centered">
-      <button id="check-now" class="secondary">
-        <span>🔔</span>
+    <!-- Action Buttons -->
+    <div class="d-flex flex-column mb-3">
+      <button id="check-now" class="btn btn-outline-primary btn-block mb-2">
+        <span class="mr-2">🔔</span>
         Check Now
       </button>
-    </div>
-    
-    <div class="button-group centered">
-      <button id="show-pr-overview" class="secondary">
-        <span>📋</span>
+      
+      <button id="show-pr-overview" class="btn btn-outline-secondary btn-block">
+        <span class="mr-2">📋</span>
         Show PR Overview
       </button>
     </div>
     
-    <div id="pr-overview-section" class="card hidden">
-      <div class="card-header">
-        <h3 class="card-title">📋 PR Overview</h3>
-        <button id="close-pr-overview" class="icon-button ghost">
-          <span>✕</span>
+    <!-- PR List -->
+    <div id="pr-list" class="mb-3"></div>
+    
+    <!-- PR Overview Section -->
+    <div id="pr-overview-section" class="card border-0 shadow-sm mb-3" style="display: none;">
+      <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+        <h6 class="card-title mb-0">📋 PR Overview</h6>
+        <button id="close-pr-overview" class="btn btn-outline-light btn-sm">
+          ✕
         </button>
       </div>
-      <div class="pr-overview-container">
-        <div id="pr-overview-content" class="pr-overview-content"></div>
-        <div class="button-group centered">
-          <button id="copy-pr-overview" class="secondary">
-            <span>📋</span>
+      <div class="card-body">
+        <div id="pr-overview-content" class="pr-overview-content mb-3"></div>
+        <div class="text-center">
+          <button id="copy-pr-overview" class="btn btn-outline-secondary">
+            <span class="mr-2">📋</span>
             Copy to Clipboard
           </button>
         </div>
       </div>
     </div>
     
-    <div id="status-message" class="notification info hidden">
+    <!-- Status Message -->
+    <div id="status-message" class="alert alert-info" role="alert" style="display: none;">
       <span id="status-text"></span>
     </div>
   </div>
+  
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
   <script src="popup.js"></script>
 </body>
 </html>

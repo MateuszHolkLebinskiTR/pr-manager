@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simple Button Test</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+  <div class="container mt-4">
+    <h1>Simple Button Test</h1>
+    
+    <button id="test-button" class="btn btn-primary">Test Button</button>
+    <div id="result" class="mt-3"></div>
+  </div>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('DOM loaded');
+      
+      const button = document.getElementById('test-button');
+      const result = document.getElementById('result');
+      
+      if (button && result) {
+        console.log('Elements found');
+        button.onclick = () => {
+          console.log('Button clicked!');
+          result.innerHTML = '<div class="alert alert-success">Button works!</div>';
+        };
+      } else {
+        console.error('Elements not found');
+      }
+    });
+  </script>
+</body>
+</html>

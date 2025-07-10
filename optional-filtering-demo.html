@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PR Manager - Optional Advanced Filtering</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .feature-card {
+            margin-bottom: 20px;
+            transition: transform 0.2s;
+        }
+        .feature-card:hover {
+            transform: translateY(-2px);
+        }
+        .checkbox-demo {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .filter-result {
+            background: #e9ecef;
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 10px;
+            font-family: monospace;
+        }
+        .enabled {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .disabled {
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center mb-4">⚙️ PR Manager - Optional Advanced Filtering</h1>
+        
+        <div class="alert alert-success">
+            <strong>✨ New Feature:</strong> Advanced PR filtering is now <strong>optional</strong>! 
+            You can enable or disable these filters in the extension settings.
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card feature-card">
+                    <div class="card-header bg-primary text-white">
+                        <h5>🔍 Filter Option 1: Approval Count</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="checkbox-demo">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="demo-approvals" onchange="updateFilterDemo()">
+                                <label class="custom-control-label" for="demo-approvals">
+                                    Only show PRs with less than 3 approvals
+                                </label>
+                            </div>
+                            <small class="text-muted">Filter out PRs that already have 3+ approvals</small>
+                        </div>
+                        
+                        <div class="filter-result" id="approval-result">
+                            <span class="disabled">❌ Disabled</span> - Shows ALL PRs regardless of approval count
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card feature-card">
+                    <div class="card-header bg-success text-white">
+                        <h5>👤 Filter Option 2: My Approval</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="checkbox-demo">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="demo-my-approval" onchange="updateFilterDemo()">
+                                <label class="custom-control-label" for="demo-my-approval">
+                                    Hide PRs I've already approved
+                                </label>
+                            </div>
+                            <small class="text-muted">Don't show PRs you've already reviewed and approved</small>
+                        </div>
+                        
+                        <div class="filter-result" id="my-approval-result">
+                            <span class="disabled">❌ Disabled</span> - Shows ALL PRs regardless of your approval status
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card feature-card">
+            <div class="card-header bg-warning text-dark">
+                <h5>🎯 Combined Filtering Result</h5>
+            </div>
+            <div class="card-body">
+                <div id="combined-result" class="filter-result">
+                    <span class="disabled">❌ No filters enabled</span> - Shows ALL PRs from tracked users
+                </div>
+                <div class="mt-3">
+                    <h6>How it works:</h6>
+                    <ul>
+                        <li><strong>Both disabled:</strong> Shows all PRs (original behavior)</li>
+                        <li><strong>One enabled:</strong> Applies only that filter</li>
+                        <li><strong>Both enabled:</strong> PRs must pass both filters (AND logic)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="card feature-card">
+            <div class="card-header bg-info text-white">
+                <h5>📋 Example PR List</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <h6>Sample PRs:</h6>
+                        <div class="pr-example" data-approvals="0" data-user-approved="false">
+                            <div class="border rounded p-2 mb-2">
+                                <strong>PR #1:</strong> New feature<br>
+                                <small>0/3 approvals | Not approved by you</small>
+                            </div>
+                        </div>
+                        <div class="pr-example" data-approvals="2" data-user-approved="false">
+                            <div class="border rounded p-2 mb-2">
+                                <strong>PR #2:</strong> Bug fix<br>
+                                <small>2/3 approvals | Not approved by you</small>
+                            </div>
+                        </div>
+                        <div class="pr-example" data-approvals="1" data-user-approved="true">
+                            <div class="border rounded p-2 mb-2">
+                                <strong>PR #3:</strong> Documentation<br>
+                                <small>1/3 approvals | ✅ Approved by you</small>
+                            </div>
+                        </div>
+                        <div class="pr-example" data-approvals="3" data-user-approved="false">
+                            <div class="border rounded p-2 mb-2">
+                                <strong>PR #4:</strong> Refactor<br>
+                                <small>3/3 approvals | Not approved by you</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <h6>Filtered Results:</h6>
+                        <div id="filtered-results" class="border rounded p-3 bg-light">
+                            <div class="text-center text-muted">
+                                <em>All PRs shown (no filters applied)</em>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card feature-card">
+            <div class="card-header bg-dark text-white">
+                <h5>🛠️ How to Enable</h5>
+            </div>
+            <div class="card-body">
+                <ol>
+                    <li>Click the PR Manager extension icon</li>
+                    <li>Click "Settings" button</li>
+                    <li>Scroll to "🔍 Advanced PR Filtering" section</li>
+                    <li>Check the filtering options you want to enable</li>
+                    <li>Click "Save Settings"</li>
+                    <li>The extension will now apply these filters to:
+                        <ul>
+                            <li>Badge count (extension icon)</li>
+                            <li>Popup PR list</li>
+                            <li>Desktop notifications</li>
+                            <li>PR overview/Teams messages</li>
+                        </ul>
+                    </li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="alert alert-info">
+            <strong>💡 Pro Tip:</strong> You can enable just one filter, both filters, or neither. 
+            The extension remembers your preference and applies it consistently across all features.
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function updateFilterDemo() {
+            const approvalFilter = document.getElementById('demo-approvals').checked;
+            const myApprovalFilter = document.getElementById('demo-my-approval').checked;
+            
+            // Update individual filter results
+            const approvalResult = document.getElementById('approval-result');
+            const myApprovalResult = document.getElementById('my-approval-result');
+            
+            if (approvalFilter) {
+                approvalResult.innerHTML = '<span class="enabled">✅ Enabled</span> - Only shows PRs with < 3 approvals';
+            } else {
+                approvalResult.innerHTML = '<span class="disabled">❌ Disabled</span> - Shows ALL PRs regardless of approval count';
+            }
+            
+            if (myApprovalFilter) {
+                myApprovalResult.innerHTML = '<span class="enabled">✅ Enabled</span> - Hides PRs you\'ve already approved';
+            } else {
+                myApprovalResult.innerHTML = '<span class="disabled">❌ Disabled</span> - Shows ALL PRs regardless of your approval status';
+            }
+            
+            // Update combined result
+            const combinedResult = document.getElementById('combined-result');
+            if (!approvalFilter && !myApprovalFilter) {
+                combinedResult.innerHTML = '<span class="disabled">❌ No filters enabled</span> - Shows ALL PRs from tracked users';
+            } else {
+                const conditions = [];
+                if (approvalFilter) conditions.push('< 3 approvals');
+                if (myApprovalFilter) conditions.push('not approved by you');
+                combinedResult.innerHTML = `<span class="enabled">✅ Filters active</span> - Shows PRs with: ${conditions.join(' AND ')}`;
+            }
+            
+            // Update example PR list
+            updateExamplePRs(approvalFilter, myApprovalFilter);
+        }
+        
+        function updateExamplePRs(approvalFilter, myApprovalFilter) {
+            const examples = document.querySelectorAll('.pr-example');
+            const filteredResults = document.getElementById('filtered-results');
+            
+            let visiblePRs = [];
+            
+            examples.forEach(example => {
+                const approvals = parseInt(example.dataset.approvals);
+                const userApproved = example.dataset.userApproved === 'true';
+                
+                let shouldShow = true;
+                
+                if (approvalFilter && approvals >= 3) {
+                    shouldShow = false;
+                }
+                
+                if (myApprovalFilter && userApproved) {
+                    shouldShow = false;
+                }
+                
+                if (shouldShow) {
+                    visiblePRs.push(example.querySelector('div').innerHTML);
+                }
+            });
+            
+            if (visiblePRs.length === 0) {
+                filteredResults.innerHTML = '<div class="text-center text-muted"><em>No PRs match the selected filters</em></div>';
+            } else if (visiblePRs.length === 4) {
+                filteredResults.innerHTML = '<div class="text-center text-muted"><em>All PRs shown (no filters applied)</em></div>';
+            } else {
+                filteredResults.innerHTML = visiblePRs.map(pr => `<div class="border rounded p-2 mb-2 bg-white">${pr}</div>`).join('');
+            }
+        }
+    </script>
+</body>
+</html>

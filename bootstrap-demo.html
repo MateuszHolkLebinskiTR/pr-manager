@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PR Manager Bootstrap Demo</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="src/bootstrap-custom.css">
+</head>
+<body>
+  <div class="container mt-4">
+    <h1>PR Manager Bootstrap Demo</h1>
+    
+    <!-- Popup Demo -->
+    <div class="row">
+      <div class="col-md-6">
+        <h2>Popup Demo</h2>
+        <div id="popup-demo" class="container-fluid p-3 border rounded" style="width: 400px;">
+          <!-- Header -->
+          <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+              <h5 class="card-title mb-0">🔄 PR Manager</h5>
+              <div class="btn-group" role="group">
+                <button class="btn btn-outline-light btn-sm" title="Refresh">🔄</button>
+                <button class="btn btn-outline-light btn-sm" title="Settings">⚙️</button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Action Buttons -->
+          <div class="d-flex flex-column mb-3">
+            <button class="btn btn-outline-primary btn-block mb-2">
+              <span class="mr-2">🔔</span>
+              Check Now
+            </button>
+            
+            <button class="btn btn-outline-secondary btn-block">
+              <span class="mr-2">📋</span>
+              Show PR Overview
+            </button>
+          </div>
+          
+          <!-- PR List Demo -->
+          <div class="mb-3">
+            <div class="pr-page-item">
+              <span class="d-flex align-items-center">
+                <a href="#" class="text-decoration-none mr-2">📁 owner/repo [@user1, @user2]</a>
+                <span class="pr-pending-count">3</span>
+              </span>
+              <button class="btn btn-outline-danger btn-sm">🗑️</button>
+            </div>
+            <div class="pr-page-item">
+              <span class="d-flex align-items-center">
+                <a href="#" class="text-decoration-none mr-2">📁 another/project</a>
+                <span class="pr-pending-count">1</span>
+              </span>
+              <button class="btn btn-outline-danger btn-sm">🗑️</button>
+            </div>
+          </div>
+          
+          <!-- Status Message -->
+          <div class="alert alert-info" role="alert">
+            <span>Status: All repositories up to date!</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Settings Demo -->
+      <div class="col-md-6">
+        <h2>Settings Demo</h2>
+        <div class="card border-0 shadow">
+          <!-- Header -->
+          <div class="card-header bg-primary text-white">
+            <h4 class="card-title mb-0">⚙️ PR Manager Settings</h4>
+          </div>
+          
+          <!-- Notification Settings -->
+          <div class="card-body">
+            <div class="card border-0 shadow-sm mb-4">
+              <div class="card-header bg-info text-white">
+                <h5 class="card-title mb-0">🔔 Notification Settings</h5>
+              </div>
+              <div class="card-body">
+                <div class="form-group">
+                  <label for="interval-demo">Notification Interval (minutes)</label>
+                  <input type="number" class="form-control" id="interval-demo" placeholder="15" />
+                  <small class="form-text text-muted">How often to check for new PR notifications</small>
+                </div>
+                
+                <div class="form-group">
+                  <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="history-demo" />
+                    <label class="custom-control-label" for="history-demo">Show Notification History</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Repository Management Demo -->
+            <div class="card border-0 shadow-sm mb-4">
+              <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">📋 Repository Management</h5>
+                <button class="btn btn-outline-dark btn-sm">
+                  <span class="mr-2">➕</span>
+                  Add Repository
+                </button>
+              </div>
+              <div class="card-body">
+                <!-- Sample Repository -->
+                <div class="card border-secondary mb-3">
+                  <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <div>
+                      <h5 class="card-title mb-1">📁 owner/repository</h5>
+                      <p class="card-text text-muted small mb-0">https://github.com/owner/repository/pulls</p>
+                    </div>
+                    <button class="btn btn-outline-danger btn-sm">
+                      <span class="mr-2">🗑️</span>
+                      Remove
+                    </button>
+                  </div>
+                  
+                  <div class="card-body">
+                    <div class="mb-3">
+                      <h6 class="text-primary">👥 Tracked Users (2)</h6>
+                      <div class="d-flex flex-wrap">
+                        <span class="badge badge-secondary mr-2 mb-2 d-flex align-items-center">
+                          @user1
+                          <button class="btn btn-sm btn-link text-white p-0 ml-1" style="line-height: 1;">✕</button>
+                        </span>
+                        <span class="badge badge-secondary mr-2 mb-2 d-flex align-items-center">
+                          @user2
+                          <button class="btn btn-sm btn-link text-white p-0 ml-1" style="line-height: 1;">✕</button>
+                        </span>
+                      </div>
+                    </div>
+                    <div class="input-group">
+                      <input type="text" class="form-control" placeholder="GitHub username" />
+                      <div class="input-group-append">
+                        <button class="btn btn-outline-secondary">
+                          <span class="mr-2">➕</span>
+                          Add User
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="d-flex justify-content-between flex-wrap">
+              <button class="btn btn-primary mb-2">
+                <span class="mr-2">💾</span>
+                Save Settings
+              </button>
+              <div class="btn-group mb-2" role="group">
+                <button class="btn btn-outline-secondary">📤 Export</button>
+                <button class="btn btn-outline-secondary">📥 Import</button>
+                <button class="btn btn-outline-secondary">💬 Teams</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
