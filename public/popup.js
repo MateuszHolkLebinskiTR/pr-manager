@@ -557,7 +557,7 @@ document.addEventListener('DOMContentLoaded', () => {
           const title = pr.title.length > 50 ? pr.title.substring(0, 50) + '...' : pr.title;
           
           // Show approval status
-          const approvalStatus = pr.approvals !== undefined ? ` (${pr.approvals}/3 ✅)` : '';
+          const approvalStatus = pr.approvals !== undefined ? ` (${pr.approvals}/2 ✅)` : '';
           
           html += `<div class="pr-item">`;
           html += `<div class="pr-title">• <a href="${pr.html_url}" target="_blank" title="${pr.title}">${title}</a>${approvalStatus}</div>`;
@@ -588,7 +588,7 @@ document.addEventListener('DOMContentLoaded', () => {
       repo.prs.forEach(pr => {
         const author = pr.user.login;
         const createdDate = new Date(pr.created_at).toLocaleDateString();
-        const approvalStatus = pr.approvals !== undefined ? ` (${pr.approvals}/3 approvals)` : '';
+        const approvalStatus = pr.approvals !== undefined ? ` (${pr.approvals}/2 approvals)` : '';
         plainText += `   - ${pr.title}${approvalStatus}\n     by @${author} (${createdDate})\n     ${pr.html_url}\n\n`;
       });
       plainText += '\n';
