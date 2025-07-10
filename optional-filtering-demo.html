@@ -60,7 +60,7 @@
                             <div class="custom-control custom-checkbox">
                                 <input type="checkbox" class="custom-control-input" id="demo-approvals" onchange="updateFilterDemo()">
                                 <label class="custom-control-label" for="demo-approvals">
-                                    Only show PRs with less than 3 approvals
+                                    Only show PRs with less than 2 approvals
                                 </label>
                             </div>
                             <small class="text-muted">Filter out PRs that already have 3+ approvals</small>
@@ -239,7 +239,7 @@
                 
                 let shouldShow = true;
                 
-                if (approvalFilter && approvals >= 3) {
+                if (approvalFilter && approvals >= 2) {
                     shouldShow = false;
                 }
                 

@@ -37,13 +37,19 @@
           <div class="custom-control custom-checkbox mb-2">
             <input type="checkbox" class="custom-control-input" id="popup-filter-approvals">
             <label class="custom-control-label" for="popup-filter-approvals">
-              <small>Only show PRs with less than 3 approvals</small>
+              <small>Only show PRs with less than 2 approvals</small>
             </label>
           </div>
-          <div class="custom-control custom-checkbox">
+          <div class="custom-control custom-checkbox mb-2">
             <input type="checkbox" class="custom-control-input" id="popup-filter-my-approval">
             <label class="custom-control-label" for="popup-filter-my-approval">
               <small>Hide PRs I've already approved</small>
+            </label>
+          </div>
+          <div class="custom-control custom-checkbox">
+            <input type="checkbox" class="custom-control-input" id="popup-filter-wip">
+            <label class="custom-control-label" for="popup-filter-wip">
+              <small>Exclude Work In Progress PRs</small>
             </label>
           </div>
         </div>
@@ -60,6 +66,11 @@
       <button id="show-pr-overview" class="btn btn-outline-secondary btn-block">
         <span class="mr-2">📋</span>
         Show PR Overview
+      </button>
+      
+      <!-- Debug button for testing badge counter -->
+      <button id="debug-badge" class="btn btn-outline-warning btn-block btn-sm mt-1">
+        🐛 Debug Badge Counter
       </button>
     </div>
     

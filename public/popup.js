@@ -44,12 +44,14 @@ function renderPRList(prPages) {
     // Get current filter settings from popup checkboxes if available, otherwise from storage
     const popupFilterApprovals = document.getElementById('popup-filter-approvals');
     const popupFilterMyApproval = document.getElementById('popup-filter-my-approval');
+    const popupFilterWip = document.getElementById('popup-filter-wip');
     
     const currentFilterSettings = await new Promise(resolve => {
-      chrome.storage.sync.get({ filterByApprovals: false, filterByMyApproval: false }, (stored) => {
+      chrome.storage.sync.get({ filterByApprovals: false, filterByMyApproval: false, filterByWip: false }, (stored) => {
         resolve({
           filterByApprovals: popupFilterApprovals ? popupFilterApprovals.checked : stored.filterByApprovals,
-          filterByMyApproval: popupFilterMyApproval ? popupFilterMyApproval.checked : stored.filterByMyApproval
+          filterByMyApproval: popupFilterMyApproval ? popupFilterMyApproval.checked : stored.filterByMyApproval,
+          filterByWip: popupFilterWip ? popupFilterWip.checked : stored.filterByWip
         });
       });
     });
@@ -68,6 +70,8 @@ function renderPRList(prPages) {
         console.warn('Failed to fetch GitHub user:', e);
       }
     }
+    
+    let totalBadgeCount = 0; // Track total for badge counter
     
     for (let idx = 0; idx < prPages.length; idx++) {
       const repo = prPages[idx];
@@ -95,9 +99,26 @@ function renderPRList(prPages) {
               
               // Apply advanced filtering only if enabled in settings
               let prsNeedingReview = filteredPRs;
-              if (combinedSettings.filterByApprovals || combinedSettings.filterByMyApproval) {
+              if (combinedSettings.filterByApprovals || combinedSettings.filterByMyApproval || combinedSettings.filterByWip) {
                 prsNeedingReview = [];
                 for (const pr of filteredPRs) {
+                  let includeThisPR = true;
+                  
+                  // Check WIP filter first (doesn't require API call)
+                  if (combinedSettings.filterByWip) {
+                    const isWIP = pr.title.toLowerCase().includes('wip') || 
+                                  pr.title.toLowerCase().includes('work in progress') ||
+                                  pr.draft === true;
+                    if (isWIP) {
+                      includeThisPR = false;
+                    }
+                  }
+                  
+                  // Skip API call if already filtered out by WIP
+                  if (!includeThisPR) {
+                    continue;
+                  }
+                  
                   try {
                     const reviewsRes = await fetch(`https://api.github.com/repos/${owner}/${repoName}/pulls/${pr.number}/reviews`, {
                       headers: { Authorization: `token ${combinedSettings.githubToken}` }
@@ -114,11 +135,9 @@ function renderPRList(prPages) {
                         review.user.login === user.login
                       );
                       
-                      // Apply filtering based on settings
-                      let includeThisPR = true;
-                      
-                      if (combinedSettings.filterByApprovals && pr.approvals >= 3) {
-                        includeThisPR = false; // Exclude PRs with 3+ approvals
+                      // Apply filtering based on settings (continue from WIP check above)
+                      if (combinedSettings.filterByApprovals && pr.approvals >= 2) {
+                        includeThisPR = false; // Exclude PRs with 2+ approvals
                       }
                       
                       if (combinedSettings.filterByMyApproval && userHasApproved) {
@@ -145,6 +164,9 @@ function renderPRList(prPages) {
         }
       }
       
+      // Add to total badge count
+      totalBadgeCount += pendingCount;
+      
       const div = document.createElement('div');
       div.className = 'pr-page-item';
       
@@ -167,6 +189,10 @@ function renderPRList(prPages) {
       `;
       prListDiv.appendChild(div);
     }
+    
+    // Update badge counter to match the total filtered PR count
+    updateBadgeCounter(totalBadgeCount);
+    console.log(`Updated badge counter to: ${totalBadgeCount}`);
   });
 }
 
@@ -217,15 +243,19 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialize popup filter checkboxes
   const popupFilterApprovals = document.getElementById('popup-filter-approvals');
   const popupFilterMyApproval = document.getElementById('popup-filter-my-approval');
+  const popupFilterWip = document.getElementById('popup-filter-wip');
   
   // Load current filter settings and sync with checkboxes
   function loadFilterSettings() {
-    chrome.storage.sync.get({ filterByApprovals: false, filterByMyApproval: false }, (settings) => {
+    chrome.storage.sync.get({ filterByApprovals: false, filterByMyApproval: false, filterByWip: false }, (settings) => {
       if (popupFilterApprovals) {
         popupFilterApprovals.checked = settings.filterByApprovals;
       }
       if (popupFilterMyApproval) {
         popupFilterMyApproval.checked = settings.filterByMyApproval;
+      }
+      if (popupFilterWip) {
+        popupFilterWip.checked = settings.filterByWip;
       }
     });
   }
@@ -234,14 +264,15 @@ document.addEventListener('DOMContentLoaded', () => {
   function saveFilterSettings() {
     const settings = {
       filterByApprovals: popupFilterApprovals ? popupFilterApprovals.checked : false,
-      filterByMyApproval: popupFilterMyApproval ? popupFilterMyApproval.checked : false
+      filterByMyApproval: popupFilterMyApproval ? popupFilterMyApproval.checked : false,
+      filterByWip: popupFilterWip ? popupFilterWip.checked : false
     };
     
     chrome.storage.sync.set(settings, () => {
       console.log('Filter settings saved:', settings);
-      // Reload PR list to apply new filters
+      // Reload PR list to apply new filters (this will also update badge)
       loadPRPages();
-      showStatus('Filters updated! 🔍', 'info');
+      showStatus('Filters updated! Badge counter synchronized 🔍', 'info');
     });
   }
   
@@ -251,6 +282,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   if (popupFilterMyApproval) {
     popupFilterMyApproval.addEventListener('change', saveFilterSettings);
+  }
+  if (popupFilterWip) {
+    popupFilterWip.addEventListener('change', saveFilterSettings);
   }
   
   // Load filter settings on popup open
@@ -364,7 +398,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Generate PR overview (same as Teams message)
   async function generatePROverview() {
     const data = await new Promise(resolve => {
-      chrome.storage.sync.get({ repositories: [], githubToken: '', filterByApprovals: false, filterByMyApproval: false }, resolve);
+      chrome.storage.sync.get({ repositories: [], githubToken: '', filterByApprovals: false, filterByMyApproval: false, filterByWip: false }, resolve);
     });
     
     if (!data.githubToken) {
@@ -418,9 +452,26 @@ document.addEventListener('DOMContentLoaded', () => {
       
       // Apply advanced filtering only if enabled in settings
       let prsNeedingReview = filteredPRs;
-      if (data.filterByApprovals || data.filterByMyApproval) {
+      if (data.filterByApprovals || data.filterByMyApproval || data.filterByWip) {
         prsNeedingReview = [];
         for (const pr of filteredPRs) {
+          let includeThisPR = true;
+          
+          // Check WIP filter first (doesn't require API call)
+          if (data.filterByWip) {
+            const isWIP = pr.title.toLowerCase().includes('wip') || 
+                          pr.title.toLowerCase().includes('work in progress') ||
+                          pr.draft === true;
+            if (isWIP) {
+              includeThisPR = false;
+            }
+          }
+          
+          // Skip API call if already filtered out by WIP
+          if (!includeThisPR) {
+            continue;
+          }
+          
           try {
             const reviewsRes = await fetch(`https://api.github.com/repos/${owner}/${repoName}/pulls/${pr.number}/reviews`, {
               headers: { Authorization: `token ${data.githubToken}` }
@@ -437,11 +488,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 review.user.login === user.login
               ) : false;
               
-              // Apply filtering based on settings
-              let includeThisPR = true;
-              
-              if (data.filterByApprovals && pr.approvals >= 3) {
-                includeThisPR = false; // Exclude PRs with 3+ approvals
+              // Apply filtering based on settings (continue from WIP check above)
+              if (data.filterByApprovals && pr.approvals >= 2) {
+                includeThisPR = false; // Exclude PRs with 2+ approvals
               }
               
               if (data.filterByMyApproval && userHasApproved) {
@@ -547,6 +596,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const { overviewData, totalPRs } = await generatePROverview();
         const htmlContent = renderPROverview(overviewData, totalPRs);
         
+        // Update badge counter to match PR overview count
+        updateBadgeCounter(totalPRs);
+        
         // Store data for clipboard copy
         const plainTextContent = generatePlainTextOverview(overviewData, totalPRs);
         const contentEl = document.getElementById('pr-overview-content');
@@ -560,7 +612,7 @@ document.addEventListener('DOMContentLoaded', () => {
           sectionEl.style.display = 'block';
         }
         
-        showStatus('PR overview loaded! 📋', 'success');
+        showStatus(`PR overview loaded! Badge updated to ${totalPRs} 📋`, 'success');
       } catch (error) {
         console.error('Failed to load PR overview:', error);
         showStatus(error.message + ' ❌', 'error');
@@ -608,5 +660,69 @@ document.addEventListener('DOMContentLoaded', () => {
         showStatus('Failed to copy to clipboard! 📋❌', 'error');
       }
     });
+  }
+
+  // Debug badge counter button
+  const debugBadgeBtn = document.getElementById('debug-badge');
+  if (debugBadgeBtn) {
+    debugBadgeBtn.addEventListener('click', async () => {
+      console.log('Debug badge button clicked');
+      
+      // Get current filter settings and display them
+      chrome.storage.sync.get({ 
+        filterByApprovals: false, 
+        filterByMyApproval: false, 
+        filterByWip: false,
+        repositories: [],
+        githubToken: ''
+      }, async (settings) => {
+        console.log('Current filter settings:', settings);
+        
+        try {
+          // Generate PR overview to get the actual count
+          const { overviewData, totalPRs } = await generatePROverview();
+          
+          const message = `Debug Info:
+- WIP Filter: ${settings.filterByWip ? 'ENABLED' : 'DISABLED'}
+- Approvals Filter: ${settings.filterByApprovals ? 'ENABLED' : 'DISABLED'}
+- My Approval Filter: ${settings.filterByMyApproval ? 'ENABLED' : 'DISABLED'}
+- Repositories: ${settings.repositories.length}
+- GitHub Token: ${settings.githubToken ? 'SET' : 'NOT SET'}
+- PR Overview Count: ${totalPRs}
+
+Updating badge to match PR overview count...`;
+          
+          showStatus(message, 'info');
+          
+          // Update badge to match PR overview
+          updateBadgeCounter(totalPRs);
+          
+          setTimeout(() => {
+            showStatus(`Badge counter synchronized with PR overview: ${totalPRs}`, 'success');
+          }, 1000);
+          
+        } catch (error) {
+          showStatus(`Error: ${error.message}`, 'error');
+        }
+      });
+    });
+  }
+  
+  // Function to update extension badge counter
+  function updateBadgeCounter(count) {
+    try {
+      chrome.runtime.sendMessage({ 
+        type: 'update-badge', 
+        count: count 
+      }, (response) => {
+        if (chrome.runtime.lastError) {
+          console.warn('Failed to update badge:', chrome.runtime.lastError);
+        } else {
+          console.log(`Badge counter updated to: ${count}`);
+        }
+      });
+    } catch (error) {
+      console.error('Error updating badge:', error);
+    }
   }
 });

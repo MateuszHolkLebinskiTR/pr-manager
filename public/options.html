@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <met                  <label class="custom-control-label" for="filter-approvals">
+                    Only show PRs with less than 2 approvals
+                  </label>harset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PR Manager Settings</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
@@ -48,16 +50,23 @@
                 <div class="custom-control custom-checkbox mb-2">
                   <input type="checkbox" class="custom-control-input" id="filter-by-approvals" />
                   <label class="custom-control-label" for="filter-by-approvals">
-                    Only show PRs with less than 3 approvals
+                    Only show PRs with less than 2 approvals
                   </label>
-                  <small class="form-text text-muted">Filter out PRs that already have 3+ approvals</small>
+                  <small class="form-text text-muted">Filter out PRs that already have 2+ approvals</small>
                 </div>
-                <div class="custom-control custom-checkbox">
+                <div class="custom-control custom-checkbox mb-2">
                   <input type="checkbox" class="custom-control-input" id="filter-by-my-approval" />
                   <label class="custom-control-label" for="filter-by-my-approval">
                     Hide PRs I've already approved
                   </label>
                   <small class="form-text text-muted">Don't show PRs you've already reviewed and approved</small>
+                </div>
+                <div class="custom-control custom-checkbox">
+                  <input type="checkbox" class="custom-control-input" id="filter-by-wip" />
+                  <label class="custom-control-label" for="filter-by-wip">
+                    Exclude Work In Progress PRs
+                  </label>
+                  <small class="form-text text-muted">Hide PRs with "WIP" in title or draft status</small>
                 </div>
               </div>
               

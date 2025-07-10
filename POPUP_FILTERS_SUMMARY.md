@@ -7,7 +7,7 @@
 1. **Quick Filter Section in Popup**:
    - Added a new collapsible card section with "🔍 Quick Filters" header
    - Two checkboxes matching the settings page options:
-     - "Only show PRs with less than 3 approvals"
+     - "Only show PRs with less than 2 approvals"
      - "Hide PRs I've already approved"
    - Clean Bootstrap 4 styling with compact collapsible layout
 

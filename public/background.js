@@ -14,7 +14,8 @@ function getNotificationSettings(cb) {
     githubToken: '', // Add githubToken to defaults
     token: '', // Also check for 'token' key for backwards compatibility
     filterByApprovals: false,
-    filterByMyApproval: false
+    filterByMyApproval: false,
+    filterByWip: false
   }, (settings) => {
     // Use either githubToken or token field
     if (!settings.githubToken && settings.token) {
@@ -145,9 +146,31 @@ async function checkPRsAndNotify() {
         
         // Apply advanced filtering only if enabled in settings
         let prsNeedingReview = filteredPRs;
-        if (settings.filterByApprovals || settings.filterByMyApproval) {
+        console.log(`Filtering settings: approvals=${settings.filterByApprovals}, myApproval=${settings.filterByMyApproval}, wip=${settings.filterByWip}`);
+        
+        if (settings.filterByApprovals || settings.filterByMyApproval || settings.filterByWip) {
           prsNeedingReview = [];
           for (const pr of filteredPRs) {
+            let includeThisPR = true;
+            
+            // Check WIP filter first (doesn't require API call)
+            if (settings.filterByWip) {
+              const isWIP = pr.title.toLowerCase().includes('wip') || 
+                            pr.title.toLowerCase().includes('work in progress') ||
+                            pr.draft === true;
+              if (isWIP) {
+                includeThisPR = false;
+                console.log(`WIP filter: excluded PR "${pr.title}" (draft: ${pr.draft})`);
+              } else {
+                console.log(`WIP filter: included PR "${pr.title}" (draft: ${pr.draft})`);
+              }
+            }
+            
+            // Skip API call if already filtered out by WIP
+            if (!includeThisPR) {
+              continue;
+            }
+            
             try {
               const match = url.match(/github.com\/(.+?)\/(.+?)\/pulls/);
               if (match) {
@@ -167,11 +190,9 @@ async function checkPRsAndNotify() {
                     review.user.login === user.login
                   );
                   
-                  // Apply filtering based on settings
-                  let includeThisPR = true;
-                  
-                  if (settings.filterByApprovals && pr.approvals >= 3) {
-                    includeThisPR = false; // Exclude PRs with 3+ approvals
+                  // Apply filtering based on settings (continue from WIP check above)
+                  if (settings.filterByApprovals && pr.approvals >= 2) {
+                    includeThisPR = false; // Exclude PRs with 2+ approvals
                   }
                   
                   if (settings.filterByMyApproval && userHasApproved) {
@@ -192,6 +213,7 @@ async function checkPRsAndNotify() {
         }
         
         // Count filtered PRs for badge (only those needing review)
+        console.log(`Repository ${url}: ${filteredPRs.length} total PRs, ${prsNeedingReview.length} after filtering`);
         totalPending += prsNeedingReview.length;
         
         // Show notification about filtered PRs
@@ -336,6 +358,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   } else if (message.type === 'check-now') {
     console.log('Manual check requested');
     checkPRsAndNotify();
+    sendResponse({ success: true });
+  } else if (message.type === 'update-badge') {
+    console.log('Badge update requested with count:', message.count);
+    const count = message.count || 0;
+    chrome.action.setBadgeText({ text: count > 0 ? String(count) : '' });
+    chrome.action.setBadgeBackgroundColor({ color: '#ff0000' });
     sendResponse({ success: true });
   }
 });

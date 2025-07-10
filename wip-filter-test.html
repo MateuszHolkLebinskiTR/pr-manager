@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WIP Filter Test</title>
+</head>
+<body>
+    <h1>WIP Filter Test</h1>
+    <div id="test-results"></div>
+    
+    <script>
+        // Test WIP filter logic
+        const testPRs = [
+            { title: "Fix bug in authentication", draft: false },
+            { title: "WIP: Add new feature", draft: false },
+            { title: "Update documentation", draft: true },
+            { title: "Work in progress: refactoring", draft: false },
+            { title: "wip - testing changes", draft: false },
+            { title: "Ready for review", draft: false }
+        ];
+        
+        function testWIPFilter(prs, filterByWip) {
+            console.log('Testing WIP filter with filterByWip =', filterByWip);
+            
+            if (!filterByWip) {
+                console.log('WIP filter disabled, returning all PRs');
+                return prs;
+            }
+            
+            const filtered = [];
+            for (const pr of prs) {
+                let includeThisPR = true;
+                
+                const isWIP = pr.title.toLowerCase().includes('wip') || 
+                              pr.title.toLowerCase().includes('work in progress') ||
+                              pr.draft === true;
+                
+                if (isWIP) {
+                    includeThisPR = false;
+                    console.log(`WIP filter: excluded PR "${pr.title}" (draft: ${pr.draft})`);
+                } else {
+                    console.log(`WIP filter: included PR "${pr.title}" (draft: ${pr.draft})`);
+                }
+                
+                if (includeThisPR) {
+                    filtered.push(pr);
+                }
+            }
+            
+            return filtered;
+        }
+        
+        // Test with WIP filter enabled
+        console.log('=== Testing with WIP filter ENABLED ===');
+        const filteredPRs = testWIPFilter(testPRs, true);
+        console.log(`Original count: ${testPRs.length}, Filtered count: ${filteredPRs.length}`);
+        
+        // Test with WIP filter disabled
+        console.log('=== Testing with WIP filter DISABLED ===');
+        const unfilteredPRs = testWIPFilter(testPRs, false);
+        console.log(`Original count: ${testPRs.length}, Unfiltered count: ${unfilteredPRs.length}`);
+        
+        // Display results
+        const resultsDiv = document.getElementById('test-results');
+        resultsDiv.innerHTML = `
+            <h2>Test Results</h2>
+            <p><strong>Original PRs:</strong> ${testPRs.length}</p>
+            <p><strong>With WIP filter enabled:</strong> ${filteredPRs.length}</p>
+            <p><strong>With WIP filter disabled:</strong> ${unfilteredPRs.length}</p>
+            
+            <h3>Original PRs:</h3>
+            <ul>
+                ${testPRs.map(pr => `<li>${pr.title} (draft: ${pr.draft})</li>`).join('')}
+            </ul>
+            
+            <h3>Filtered PRs (WIP filter enabled):</h3>
+            <ul>
+                ${filteredPRs.map(pr => `<li>${pr.title} (draft: ${pr.draft})</li>`).join('')}
+            </ul>
+        `;
+    </script>
+</body>
+</html>

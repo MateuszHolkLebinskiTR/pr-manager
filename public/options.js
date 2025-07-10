@@ -31,6 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const githubTokenInput = document.getElementById('github-token');
   const filterByApprovalsInput = document.getElementById('filter-by-approvals');
   const filterByMyApprovalInput = document.getElementById('filter-by-my-approval');
+  const filterByWipInput = document.getElementById('filter-by-wip');
 
   // Load existing settings
   chrome.storage.sync.get({
@@ -41,7 +42,8 @@ document.addEventListener('DOMContentLoaded', () => {
     githubToken: '',
     repositories: [], // New structure for repositories with tracked users
     filterByApprovals: false,
-    filterByMyApproval: false
+    filterByMyApproval: false,
+    filterByWip: false
   }, (data) => {
     intervalInput.value = data.interval;
     workingHoursInput.value = data.workingHours;
@@ -50,6 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
     githubTokenInput.value = data.githubToken;
     filterByApprovalsInput.checked = data.filterByApprovals;
     filterByMyApprovalInput.checked = data.filterByMyApproval;
+    filterByWipInput.checked = data.filterByWip;
     
     // Load repositories
     loadRepositories(data.repositories);
@@ -69,7 +72,8 @@ document.addEventListener('DOMContentLoaded', () => {
       customMessage: customMessageInput.value,
       githubToken: githubTokenInput.value,
       filterByApprovals: filterByApprovalsInput.checked,
-      filterByMyApproval: filterByMyApprovalInput.checked
+      filterByMyApproval: filterByMyApprovalInput.checked,
+      filterByWip: filterByWipInput.checked
     };
     
     chrome.storage.sync.set(settings, () => {
@@ -126,7 +130,13 @@ document.addEventListener('DOMContentLoaded', () => {
   // Generate Teams message with improved formatting
   async function generateTeamsMessage() {
     const data = await new Promise(resolve => {
-      chrome.storage.sync.get({ repositories: [], githubToken: '' }, resolve);
+      chrome.storage.sync.get({ 
+        repositories: [], 
+        githubToken: '', 
+        filterByApprovals: false, 
+        filterByMyApproval: false, 
+        filterByWip: false 
+      }, resolve);
     });
     
     if (!data.githubToken) {
@@ -135,6 +145,19 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (!data.repositories || data.repositories.length === 0) {
       throw new Error('No repositories added yet!');
+    }
+    
+    // Get current user info for approval filtering
+    let user = null;
+    if (data.filterByApprovals || data.filterByMyApproval) {
+      try {
+        const userRes = await fetch('https://api.github.com/user', {
+          headers: { Authorization: `token ${data.githubToken}` }
+        });
+        user = await userRes.json();
+      } catch (e) {
+        console.warn('Failed to fetch GitHub user:', e);
+      }
     }
     
     let teamsMessage = '📋 **GitHub PRs to Review:**\n\n';
@@ -168,19 +191,80 @@ document.addEventListener('DOMContentLoaded', () => {
         );
       }
       
-      if (filteredPRs.length > 0) {
+      // Apply advanced filtering only if enabled in settings
+      let prsNeedingReview = filteredPRs;
+      if (data.filterByApprovals || data.filterByMyApproval || data.filterByWip) {
+        prsNeedingReview = [];
+        for (const pr of filteredPRs) {
+          let includeThisPR = true;
+          
+          // Check WIP filter first (doesn't require API call)
+          if (data.filterByWip) {
+            const isWIP = pr.title.toLowerCase().includes('wip') || 
+                          pr.title.toLowerCase().includes('work in progress') ||
+                          pr.draft === true;
+            if (isWIP) {
+              includeThisPR = false;
+            }
+          }
+          
+          // Skip API call if already filtered out by WIP
+          if (!includeThisPR) {
+            continue;
+          }
+          
+          // Apply approval filters (requires API calls)
+          if (data.filterByApprovals || data.filterByMyApproval) {
+            try {
+              const reviewsRes = await fetch(`https://api.github.com/repos/${owner}/${repoName}/pulls/${pr.number}/reviews`, {
+                headers: { Authorization: `token ${data.githubToken}` }
+              });
+              if (reviewsRes.ok) {
+                const reviews = await reviewsRes.json();
+                
+                // Count total approvals
+                const approvals = reviews.filter(review => review.state === 'APPROVED');
+                pr.approvals = approvals.length;
+                
+                // Check if current user has approved
+                const userHasApproved = user ? approvals.some(review => 
+                  review.user.login === user.login
+                ) : false;
+                
+                // Apply filtering based on settings
+                if (data.filterByApprovals && pr.approvals >= 2) {
+                  includeThisPR = false; // Exclude PRs with 2+ approvals
+                }
+                
+                if (data.filterByMyApproval && userHasApproved) {
+                  includeThisPR = false; // Exclude PRs already approved by user
+                }
+              }
+            } catch (e) {
+              console.warn('Failed to fetch reviews for PR', pr.number, e);
+              // If we can't fetch reviews, include the PR to be safe
+            }
+          }
+          
+          if (includeThisPR) {
+            prsNeedingReview.push(pr);
+          }
+        }
+      }
+      
+      if (prsNeedingReview.length > 0) {
         const userFilter = repo.trackedUsers.length > 0 ? 
           ` [Tracking: ${repo.trackedUsers.map(u => `@${u}`).join(', ')}]` : '';
         
-        teamsMessage += `**${repoCounter}. ${displayName}** (${filteredPRs.length} PRs${userFilter})\n`;
-        filteredPRs.forEach(pr => {
+        teamsMessage += `**${repoCounter}. ${displayName}** (${prsNeedingReview.length} PRs${userFilter})\n`;
+        prsNeedingReview.forEach(pr => {
           const author = pr.user.login;
           const createdDate = new Date(pr.created_at).toLocaleDateString();
           teamsMessage += `   - [${pr.title}](${pr.html_url}) by @${author} (${createdDate})\n`;
         });
         teamsMessage += '\n';
         repoCounter++;
-        totalPRs += filteredPRs.length;
+        totalPRs += prsNeedingReview.length;
       }
     }
     

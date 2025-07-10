@@ -9,7 +9,7 @@ The advanced PR filtering feature has been successfully refactored to be **optio
 
 1. **`public/options.html`**
    - Added two new checkboxes in the "🔍 Advanced PR Filtering" section:
-     - "Only show PRs with less than 3 approvals"
+     - "Only show PRs with less than 2 approvals"
      - "Hide PRs I've already approved"
    - Added explanatory text for each option
 

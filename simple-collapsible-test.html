@@ -40,7 +40,24 @@
       </div>
       <div class="collapse-content" id="quickFiltersCollapse" style="display: none;">
         <div class="card-body py-2">
-          <p>This content should show/hide when clicking the header above.</p>
+          <div class="custom-control custom-checkbox mb-2">
+            <input type="checkbox" class="custom-control-input" id="filter-approvals">
+            <label class="custom-control-label" for="filter-approvals">
+              <small>Only show PRs with less than 2 approvals</small>
+            </label>
+          </div>
+          <div class="custom-control custom-checkbox mb-2">
+            <input type="checkbox" class="custom-control-input" id="filter-my-approval">
+            <label class="custom-control-label" for="filter-my-approval">
+              <small>Hide PRs I've already approved</small>
+            </label>
+          </div>
+          <div class="custom-control custom-checkbox">
+            <input type="checkbox" class="custom-control-input" id="filter-wip">
+            <label class="custom-control-label" for="filter-wip">
+              <small>Exclude Work In Progress PRs</small>
+            </label>
+          </div>
         </div>
       </div>
     </div>
