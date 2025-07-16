@@ -95,6 +95,59 @@
           </div>
         </div>
 
+        <!-- Teams Integration -->
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-header bg-primary text-white">
+            <h5 class="card-title mb-0">💬 Microsoft Teams Integration</h5>
+          </div>
+          <div class="card-body">
+            <div class="form-group">
+              <label for="teams-webhook-url">
+                <strong>Teams Webhook URL</strong>
+              </label>
+              <input type="url" class="form-control" id="teams-webhook-url" 
+                     placeholder="https://outlook.office.com/webhook/..." />
+              <small class="form-text text-muted">
+                <strong>Option 1:</strong> Classic Incoming Webhook - Channel → "..." → Connectors → Incoming Webhook → Configure<br>
+                <strong>Option 2:</strong> Teams Workflows - Channel → "..." → Workflows → "Post to a channel when a webhook request is received"
+              </small>
+            </div>
+            <div class="form-group">
+              <label for="teams-sender-name">
+                <strong>Sender Name</strong>
+              </label>
+              <input type="text" class="form-control" id="teams-sender-name" 
+                     placeholder="PR Manager Bot" />
+              <small class="form-text text-muted">
+                Name that will appear as the sender of Teams messages
+              </small>
+            </div>
+            <div class="d-flex justify-content-start flex-wrap">
+              <button type="button" class="btn btn-success mr-2 mb-2" id="test-teams-webhook">
+                <span class="mr-2">🧪</span>
+                Test Webhook
+              </button>
+              <button type="button" class="btn btn-info mr-2 mb-2" id="post-to-teams">
+                <span class="mr-2">📤</span>
+                Post to Teams
+              </button>
+              <button type="button" class="btn btn-outline-info mr-2 mb-2" id="force-post-to-teams">
+                <span class="mr-2">🔄</span>
+                Force Post
+              </button>
+              <button type="button" class="btn btn-outline-secondary mb-2" id="clear-teams-history">
+                <span class="mr-2">🗑️</span>
+                Clear History
+              </button>
+            </div>
+            <small class="form-text text-muted mt-2">
+              <strong>Post to Teams:</strong> Only posts if content has changed since last post<br>
+              <strong>Force Post:</strong> Posts regardless of changes (useful for testing)<br>
+              <strong>Clear History:</strong> Resets change detection (next post will always go through)
+            </small>
+          </div>
+        </div>
+
         <!-- Repository Management -->
         <div class="card border-0 shadow-sm mb-4">
           <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">

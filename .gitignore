@@ -66,3 +66,4 @@ key.pem
 .cache/
 .parcel-cache/
 .vite/
+.github/

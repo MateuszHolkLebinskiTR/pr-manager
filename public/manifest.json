@@ -13,7 +13,11 @@
   ],
   "host_permissions": [
     "https://github.com/*",
-    "https://api.github.com/*"
+    "https://api.github.com/*",
+    "https://outlook.office.com/*",
+    "https://*.office.com/*",
+    "https://*.office365.com/*",
+    "https://*.microsoft.com/*"
   ],
   "background": {
     "service_worker": "background.js"
