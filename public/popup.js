@@ -597,6 +597,196 @@ document.addEventListener('DOMContentLoaded', () => {
     return plainText;
   }
 
+  // Shared function to automatically post to Teams with duplicate detection
+  async function autoPostToTeams(overviewData, totalPRs, context = 'manual') {
+    console.log(`🚀 Auto-posting to Teams from ${context}...`);
+    
+    // Get Teams webhook settings
+    const teamsSettings = await new Promise(resolve => {
+      chrome.storage.sync.get({
+        teamsWebhookUrl: '',
+        teamsSenderName: 'PR Manager Bot'
+      }, resolve);
+    });
+    
+    if (!teamsSettings.teamsWebhookUrl) {
+      console.log('⏭️ No Teams webhook URL configured - skipping auto-post');
+      return { success: false, reason: 'No webhook URL configured' };
+    }
+    
+    if (totalPRs === 0) {
+      console.log('⏭️ No PRs to post - skipping auto-post');
+      return { success: false, reason: 'No PRs found' };
+    }
+    
+    try {
+      // Generate content hash to check for changes
+      const currentContentHash = generateContentHash(overviewData, totalPRs);
+      
+      // Check if content has changed since last post
+      const { lastTeamsContentHash } = await new Promise(resolve => {
+        chrome.storage.sync.get({ lastTeamsContentHash: null }, resolve);
+      });
+      
+      if (lastTeamsContentHash === currentContentHash) {
+        console.log('⏭️ No changes detected since last Teams post - skipping to avoid spam');
+        return { success: false, reason: 'No changes detected' };
+      }
+      
+      // Create Teams payload
+      const teamsCard = {
+        "@type": "MessageCard",
+        "@context": "https://schema.org/extensions",
+        "summary": `GitHub PRs to Review (${totalPRs} total)`,
+        "themeColor": "0076D7",
+        "title": `📋 GitHub PRs to Review (${totalPRs} total) [${context}]`,
+        "originator": teamsSettings.teamsSenderName,
+        "sections": [{
+          "facts": []
+        }]
+      };
+      
+      // Add PR facts grouped by repository
+      for (const repoData of overviewData) {
+        teamsCard.sections[0].facts.push({
+          "name": `📁 ${repoData.repoName}`,
+          "value": `${repoData.prs.length} PRs`
+        });
+        
+        for (const pr of repoData.prs.slice(0, 5)) { // Limit to 5 PRs per repo for Teams
+          const approvalText = pr.approvals !== undefined ? ` (${pr.approvals}/2 ✅)` : '';
+          teamsCard.sections[0].facts.push({
+            "name": `  ${pr.title.substring(0, 50)}${pr.title.length > 50 ? '...' : ''}`,
+            "value": `by @${pr.user.login}${approvalText} - [View PR](${pr.html_url})`
+          });
+        }
+        
+        if (repoData.prs.length > 5) {
+          teamsCard.sections[0].facts.push({
+            "name": "  ...",
+            "value": `and ${repoData.prs.length - 5} more PRs`
+          });
+        }
+      }
+      
+      // Create alternative simple text format for Teams Workflows
+      const simplePayload = {
+        "text": `📋 **GitHub PRs to Review (${totalPRs} total)** [${context}]\n\n` +
+               overviewData.map(repoData => 
+                 `**📁 ${repoData.repoName}** (${repoData.prs.length} PRs)\n` +
+                 repoData.prs.slice(0, 5).map(pr => {
+                   const approvalText = pr.approvals !== undefined ? ` (${pr.approvals}/2 ✅)` : '';
+                   return `• [${pr.title.substring(0, 60)}${pr.title.length > 60 ? '...' : ''}](${pr.html_url}) by @${pr.user.login}${approvalText}`;
+                 }).join('\n') +
+                 (repoData.prs.length > 5 ? `\n• ...and ${repoData.prs.length - 5} more PRs` : '')
+               ).join('\n\n') +
+               `\n\n*Posted by ${teamsSettings.teamsSenderName}*`
+      };
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+      
+      // Try MessageCard format first, then simple text format
+      let response;
+      try {
+        response = await fetch(teamsSettings.teamsWebhookUrl, {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'User-Agent': 'PR-Manager-Extension/0.1.0'
+          },
+          body: JSON.stringify(teamsCard),
+          signal: controller.signal
+        });
+        
+        if (!response.ok) {
+          console.log('MessageCard format failed, trying simple text format...');
+          response = await fetch(teamsSettings.teamsWebhookUrl, {
+            method: 'POST',
+            headers: { 
+              'Content-Type': 'application/json',
+              'User-Agent': 'PR-Manager-Extension/0.1.0'
+            },
+            body: JSON.stringify(simplePayload),
+            signal: controller.signal
+          });
+        }
+      } catch (error) {
+        if (error.name !== 'AbortError') {
+          console.log('MessageCard format error, trying simple text format...', error);
+          response = await fetch(teamsSettings.teamsWebhookUrl, {
+            method: 'POST',
+            headers: { 
+              'Content-Type': 'application/json',
+              'User-Agent': 'PR-Manager-Extension/0.1.0'
+            },
+            body: JSON.stringify(simplePayload),
+            signal: controller.signal
+          });
+        } else {
+          throw error;
+        }
+      }
+      
+      clearTimeout(timeoutId);
+      
+      if (response.ok) {
+        // Save the content hash for future comparison
+        chrome.storage.sync.set({ lastTeamsContentHash: currentContentHash }, () => {
+          console.log('Saved Teams content hash for change detection');
+        });
+        
+        console.log(`🎉 Successfully auto-posted ${totalPRs} PRs to Teams!`);
+        return { success: true, message: `Auto-posted ${totalPRs} PRs to Teams!` };
+      } else {
+        const responseText = await response.text();
+        console.error('Teams auto-posting response error:', responseText);
+        throw new Error(`HTTP ${response.status}: ${response.statusText || 'Unknown error'}`);
+      }
+      
+    } catch (error) {
+      console.error('Teams auto-posting error:', error);
+      
+      let errorMessage = 'Unknown error occurred';
+      if (error.name === 'AbortError') {
+        errorMessage = 'Request timed out (check your network connection)';
+      } else if (error.message.includes('Failed to fetch')) {
+        errorMessage = 'Network error - check your internet connection and webhook URL';
+      } else {
+        errorMessage = error.message;
+      }
+      
+      return { success: false, reason: errorMessage };
+    }
+  }
+
+  // Generate content hash for change detection (same as options.js)
+  function generateContentHash(overviewData, totalPRs) {
+    const contentString = JSON.stringify({
+      totalPRs,
+      repos: overviewData.map(repo => ({
+        name: repo.repoName,
+        count: repo.prs.length,
+        prs: repo.prs.map(pr => ({
+          id: pr.id,
+          title: pr.title,
+          user: pr.user.login,
+          approvals: pr.approvals,
+          html_url: pr.html_url
+        }))
+      }))
+    });
+    
+    // Simple hash function
+    let hash = 0;
+    for (let i = 0; i < contentString.length; i++) {
+      const char = contentString.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32bit integer
+    }
+    return hash.toString();
+  }
+
   // Show PR Overview button
   const showOverviewBtn = document.getElementById('show-pr-overview');
   if (showOverviewBtn) {
@@ -624,7 +814,22 @@ document.addEventListener('DOMContentLoaded', () => {
           sectionEl.style.display = 'block';
         }
         
-        showStatus(`PR overview loaded! Badge updated to ${totalPRs} 📋`, 'success');
+        // Auto-post to Teams (respects duplicate detection)
+        const teamsResult = await autoPostToTeams(overviewData, totalPRs, 'popup-overview');
+        
+        if (teamsResult.success) {
+          showStatus(`PR overview loaded! Badge updated to ${totalPRs}. ${teamsResult.message} 📋🎉`, 'success');
+        } else {
+          let statusMessage = `PR overview loaded! Badge updated to ${totalPRs} 📋`;
+          if (teamsResult.reason === 'No changes detected') {
+            statusMessage += ' (Teams: no changes to post)';
+          } else if (teamsResult.reason === 'No webhook URL configured') {
+            statusMessage += ' (Teams: not configured)';
+          } else if (teamsResult.reason !== 'No PRs found') {
+            statusMessage += ` (Teams error: ${teamsResult.reason})`;
+          }
+          showStatus(statusMessage, teamsResult.reason.includes('error') ? 'warning' : 'success');
+        }
       } catch (error) {
         console.error('Failed to load PR overview:', error);
         showStatus(error.message + ' ❌', 'error');
